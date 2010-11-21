@@ -7,10 +7,76 @@
 <script type="text/javascript" src="sylvester.js"></script>
 <script type="text/javascript" src="glUtils.js"></script>
 
+<script id="per-fragment-lighting-fs" type="x-shader/x-fragment">
+  #ifdef GL_ES
+  precision highp float;
+  #endif
+
+  varying vec2 vTextureCoord;
+  varying vec4 vTransformedNormal;
+  varying vec4 vPosition;
+
+  uniform bool uUseLighting;
+  uniform bool uUseTextures;
+
+  uniform vec3 uAmbientColor;
+
+  uniform vec3 uPointLightingLocation;
+  uniform vec3 uPointLightingColor;
+
+  uniform sampler2D uSampler;
+
+
+  void main(void) {
+    vec3 lightWeighting;
+    if (!uUseLighting) {
+      lightWeighting = vec3(1.0, 1.0, 1.0);
+    } else {
+      vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
+
+      float directionalLightWeighting = max(dot(normalize(vTransformedNormal.xyz), lightDirection), 0.0);
+      lightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;
+    }
+
+    vec4 fragmentColor;
+    if (uUseTextures) {
+      fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+    } else {
+      fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
+    }
+    gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
+  }
+</script>
+
+<script id="per-fragment-lighting-vs" type="x-shader/x-vertex">
+  attribute vec3 aVertexPosition;
+  attribute vec3 aVertexNormal;
+  attribute vec2 aTextureCoord;
+
+  uniform mat4 uMVMatrix;
+  uniform mat4 uPMatrix;
+  uniform mat4 uNMatrix;
+
+  varying vec2 vTextureCoord;
+  varying vec4 vTransformedNormal;
+  varying vec4 vPosition;
+
+
+  void main(void) {
+    vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
+    gl_Position = uPMatrix * vPosition;
+    vTextureCoord = aTextureCoord;
+    vTransformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);
+  }
+</script>
+
+
 <script id="shader-fs" type="x-shader/x-fragment">
   #ifdef GL_ES
   precision highp float;
   #endif
+
+  uniform bool uUseTextures;
 
   varying vec2 vTextureCoord;
   varying vec3 vLightWeighting;
@@ -18,7 +84,13 @@
   uniform sampler2D uSampler;
 
   void main(void) {
-     vec4 textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+     vec4 textureColor;
+     if (uUseTextures) {
+        textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
+     }
+     else {
+        textureColor = vec4(1.0,1.0,1.0,1.0);
+     }
      gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
   }
 </script>
@@ -127,49 +199,60 @@
     return shader;
   }
 
+  
+  function createProgram(fragmentShaderID, vertexShaderID) {
+    var fragmentShader = getShader(gl, fragmentShaderID);
+    var vertexShader = getShader(gl, vertexShaderID);
 
-  var shaderProgram;
-  function initShaders() {
-    var fragmentShader = getShader(gl, "shader-fs");
-    var vertexShader = getShader(gl, "shader-vs");
+    var program = gl.createProgram();
+    gl.attachShader(program, vertexShader);
+    gl.attachShader(program, fragmentShader);
+    gl.linkProgram(program);
 
-    shaderProgram = gl.createProgram();
-    gl.attachShader(shaderProgram, vertexShader);
-    gl.attachShader(shaderProgram, fragmentShader);
-    gl.linkProgram(shaderProgram);
-
-    if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       alert("Could not initialise shaders");
     }
 
-    gl.useProgram(shaderProgram);
+    program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
+    gl.enableVertexAttribArray(program.vertexPositionAttribute);
 
-    shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
-    gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+    program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
+    gl.enableVertexAttribArray(program.vertexNormalAttribute);
 
-    shaderProgram.textureCoordAttribute = gl.getAttribLocation(shaderProgram, "aTextureCoord");
-    gl.enableVertexAttribArray(shaderProgram.textureCoordAttribute);
+    program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
+    gl.enableVertexAttribArray(program.textureCoordAttribute);
 
-    shaderProgram.vertexNormalAttribute = gl.getAttribLocation(shaderProgram, "aVertexNormal");
-    gl.enableVertexAttribArray(shaderProgram.vertexNormalAttribute);
+    program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+    program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+    program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
+    program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+    program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
+    program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
+    program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
+    program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
+    program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
 
-    shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
-    shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
-    shaderProgram.nMatrixUniform = gl.getUniformLocation(shaderProgram, "uNMatrix");
-    shaderProgram.samplerUniform = gl.getUniformLocation(shaderProgram, "uSampler");
-    shaderProgram.useLightingUniform = gl.getUniformLocation(shaderProgram, "uUseLighting");
-    shaderProgram.ambientColorUniform = gl.getUniformLocation(shaderProgram, "uAmbientColor");
-    shaderProgram.pointLightingLocationUniform = gl.getUniformLocation(shaderProgram, "uPointLightingLocation");
-    shaderProgram.pointLightingColorUniform = gl.getUniformLocation(shaderProgram, "uPointLightingColor");
+    return program;
   }
 
+
+  var currentProgram;
+  var perVertexProgram;
+  var perFragmentProgram;
+  function initShaders() {
+    perFragmentProgram = createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs");
+    perVertexProgram = createProgram("shader-fs", "shader-vs");
+  }
+  
 
   function handleLoadedTexture(texture) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+    gl.generateMipmap(gl.TEXTURE_2D);
+
 
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
@@ -234,12 +317,12 @@
 
 
   function setMatrixUniforms() {
-    gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, new Float32Array(pMatrix.flatten()));
-    gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, new Float32Array(mvMatrix.flatten()));
+    gl.uniformMatrix4fv(currentProgram.pMatrixUniform, false, new Float32Array(pMatrix.flatten()));
+    gl.uniformMatrix4fv(currentProgram.mvMatrixUniform, false, new Float32Array(mvMatrix.flatten()));
 
     var normalMatrix = mvMatrix.inverse();
     normalMatrix = normalMatrix.transpose();
-    gl.uniformMatrix4fv(shaderProgram.nMatrixUniform, false, new Float32Array(normalMatrix.flatten()));
+    gl.uniformMatrix4fv(currentProgram.nMatrixUniform, false, new Float32Array(normalMatrix.flatten()));
   }
 
 
@@ -407,31 +490,42 @@
 
     perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 
+    var perFragmentLighting = document.getElementById("per-fragment").checked;
+    if (perFragmentLighting) {
+      currentProgram = perFragmentProgram;
+    } else {
+      currentProgram = perVertexProgram;
+    }
+    gl.useProgram(currentProgram);
+
+
     var lighting = document.getElementById("lighting").checked;
-    gl.uniform1i(shaderProgram.useLightingUniform, lighting);
+    gl.uniform1i(currentProgram.useLightingUniform, lighting);
     if (lighting) {
       gl.uniform3f(
-        shaderProgram.ambientColorUniform,
+        currentProgram.ambientColorUniform,
         parseFloat(document.getElementById("ambientR").value),
         parseFloat(document.getElementById("ambientG").value),
         parseFloat(document.getElementById("ambientB").value)
       );
 
       gl.uniform3f(
-        shaderProgram.pointLightingLocationUniform,
+        currentProgram.pointLightingLocationUniform,
         parseFloat(document.getElementById("lightPositionX").value),
         parseFloat(document.getElementById("lightPositionY").value),
         parseFloat(document.getElementById("lightPositionZ").value)
       );
 
       gl.uniform3f(
-        shaderProgram.pointLightingColorUniform,
+        currentProgram.pointLightingColorUniform,
         parseFloat(document.getElementById("pointR").value),
         parseFloat(document.getElementById("pointG").value),
         parseFloat(document.getElementById("pointB").value)
       );
     }
 
+    var textures = document.getElementById("textures").checked;
+    gl.uniform1i(currentProgram.useTexturesUniform, textures);
 
     loadIdentity();
     
@@ -442,16 +536,16 @@
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, mudTexture);
-    gl.uniform1i(shaderProgram.samplerUniform, 0);
+    gl.uniform1i(currentProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexTextureCoordBuffer);
-    gl.vertexAttribPointer(shaderProgram.textureCoordAttribute, worldVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, worldVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexNormalBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexNormalAttribute, worldVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, worldVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexPositionBuffer);
-    gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, worldVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, worldVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms();
     gl.drawArrays(gl.TRIANGLES, 0, worldVertexPositionBuffer.numItems);
@@ -557,7 +651,8 @@ look up and down.<br/>
   <br/>
 
 <input type="checkbox" id="lighting" checked /> Use lighting<br/>
-
+<input type="checkbox" id="textures" checked /> Use textures<br/>
+<input type="checkbox" id="per-fragment" checked /> Per-fragment lighting<br/>
 <br/>
 <h2>Directional light:</h2>
 
