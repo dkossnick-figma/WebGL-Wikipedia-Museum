@@ -1,363 +1,21 @@
+<!DOCTYPE html>
 <html>
-
 <head>
-<title>Learning WebGL &mdash; lesson 10.5</title>
-<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
+<title>Wikipedia Art Gallery</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 
-<script type="text/javascript" src="sylvester.js"></script>
-<script type="text/javascript" src="glUtils.js"></script>
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="includes/sylvester.js"></script>
+<script type="text/javascript" src="includes/glUtils.js"></script>
 
-
-<script id="per-fragment-spotlight-fs" type="x-shader/x-fragment">
-  #ifdef GL_ES
-  precision highp float;
-  #endif
-
-  varying vec2 vTextureCoord;
-  varying vec4 vTransformedNormal;
-  varying vec4 vPosition;
-
-  uniform bool uUseLighting;
-  uniform bool uUseTextures;
-
-  uniform vec3 uAmbientColor;
-
-  uniform vec3 uPointLightingLocation;
-  uniform vec3 uPointLightingColor;
-  uniform vec3 uPointLightingDirection;
-
-  uniform sampler2D uSampler;
-  
-  // new
-  const float cos_outer_cone_angle = 0.8; // 36 degrees
-  const float cos_inner_cone_angle = 0.799; // 32 degrees?
-  const float spotCosCutoff = -0.3;
-  const float shininess = 0.9;
-
-  void main(void) {
-    vec4 final_color = vec4(1.0,0,0,1.0);
-    vec4 textureColor;
-    if (uUseTextures) {
-      textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-    } else {
-      textureColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-    if (!uUseLighting) {
-      gl_FragColor = textureColor;
-      return;
-    }
-    
-    vec3 L = normalize(uPointLightingDirection);
-    vec3 D = normalize(uPointLightingLocation - vPosition.xyz);
-    
-    if (dot(-L, D) >= spotCosCutoff)
-    {
-        vec3 N = normalize(vTransformedNormal.xyz);
-        
-        final_color =  vec4(0.0,1.0,0,1.0);
-    
-        float lambertTerm = max( dot(N,L), 0.0);
-        if(lambertTerm > 0.0)
-        {
-            final_color = textureColor * lambertTerm;
-        /*
-            vec3 E = normalize(eyeVec);
-            vec3 R = reflect(-L, N);
-            
-            float specular = pow( max(dot(R, E), 0.0), 
-            gl_FrontMaterial.shininess );
-            
-            final_color += gl_LightSource[0].specular * 
-            gl_FrontMaterial.specular * 
-            specular;*/
-        }
-    }
-    
-    gl_FragColor = final_color;
-  }
-  
-  /*
-    vec4 final_color;
-    vec4 textureColor;
-    if (uUseTextures) {
-      textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-    } else {
-      textureColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-    if (!uUseLighting) {
-      gl_FragColor = textureColor;
-      return;
-    }
-    
-    vec3 spotDirection = normalize(uPointLightingLocation - vPosition.xyz);
-    vec3 lightDirection = normalize(uPointLightingDirection);
-    
-    float cos_cur_angle = dot(-lightDirection, spotDirection);
-    float cos_inner_minus_outer_angle = cos_inner_cone_angle - cos_outer_cone_angle;
-    
-    // Don't need dynamic branching at all, precompute 
-    // falloff (i will call it spot)
-    float spot = clamp((cos_cur_angle - cos_outer_cone_angle) / 
-           cos_inner_minus_outer_angle, 0.0, 1.0);
-    
-    float lambertTerm = max( dot(vTransformedNormal.xyz,lightDirection), 0.0);
-    if(lambertTerm > 0.0)
-    {
-        final_color = textureColor + lambertTerm * spot;
-    }
-    
-    
-    vec3 lightWeighting;
-
-    float directionalLightWeighting = max(dot(normalize(vTransformedNormal.xyz), spotDirection), 0.0);
-    lightWeighting = uAmbientColor + directionalLightWeighting * uPointLightingColor;
-    
-    gl_FragColor = vec4( final_color.xyz, textureColor.a);
-  }*/
-  
-  
-  
-  
-/*
-varying vec3 normal, lightDir, eyeVec;
-
-void main (void)
-{
-	vec4 final_color =
-	(gl_FrontLightModelProduct.sceneColor * gl_FrontMaterial.ambient) +
-	(gl_LightSource[0].ambient * gl_FrontMaterial.ambient);
-
-	vec3 L = normalize(lightDir);
-	vec3 D = normalize(gl_LightSource[0].spotDirection);
-
-	float cos_cur_angle = dot(-L, D);
-
-	float cos_inner_cone_angle = gl_LightSource[0].spotCosCutoff;
-
-	float cos_inner_minus_outer_angle = 
-	      cos_inner_cone_angle - cos_outer_cone_angle;
-	
-	//****************************************************
-	// Don't need dynamic branching at all, precompute 
-	// falloff(i will call it spot)
-	float spot = 0.0;
-	spot = clamp((cos_cur_angle - cos_outer_cone_angle) / 
-	       cos_inner_minus_outer_angle, 0.0, 1.0);
-	//****************************************************
-
-	vec3 N = normalize(normal);
-
-	float lambertTerm = max( dot(N,L), 0.0);
-	if(lambertTerm > 0.0)
-	{
-		final_color += gl_LightSource[0].diffuse *
-			gl_FrontMaterial.diffuse *
-			lambertTerm * spot;
-
-		vec3 E = normalize(eyeVec);
-		vec3 R = reflect(-L, N);
-
-		float specular = pow( max(dot(R, E), 0.0),
-			gl_FrontMaterial.shininess );
-
-		final_color += gl_LightSource[0].specular *
-			gl_FrontMaterial.specular *
-			specular * spot;
-	}
-	gl_FragColor = final_color;
-}
-*/
-</script>
-
-<script id="per-fragment-spotlight-vs" type="x-shader/x-vertex">
-  attribute vec3 aVertexPosition;
-  attribute vec3 aVertexNormal;
-  attribute vec2 aTextureCoord;
-
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
-  uniform mat4 uNMatrix;
-
-  varying vec2 vTextureCoord;
-  varying vec4 vTransformedNormal;
-  varying vec4 vPosition;
-  
-  // new
-//  varying vec3 eyeVec;
-//  varying vec3 lightDir;
-
-
-/*
-varying vec3 normal, lightDir, eyeVec;
-
-void main()
-{	
-	normal = gl_NormalMatrix * gl_Normal;
-
-	vec3 vVertex = vec3(gl_ModelViewMatrix * gl_Vertex);
-
-	lightDir = vec3(gl_LightSource[0].position.xyz - vVertex);
-	eyeVec = -vVertex;
-
-	gl_Position = ftransform();		
-}
-*/
-
-
-  void main(void) {
-    vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-    gl_Position = uPMatrix * vPosition;
-    vTextureCoord = aTextureCoord;
-    vTransformedNormal = /*uNMatrix */ vec4(aVertexNormal, 1.0);
-    // new
-//    lightDir = vec3(lightsource.xyz - vPosition);
-//    eyeVec = -vPosition;
-  }
-</script>
-
-<script id="per-fragment-lighting-fs" type="x-shader/x-fragment">
-  #ifdef GL_ES
-  precision highp float;
-  #endif
-
-  varying vec2 vTextureCoord;
-  varying vec4 vTransformedNormal;
-  varying vec4 vPosition;
-
-  uniform bool uUseLighting;
-  uniform bool uUseTextures;
-
-  uniform vec3 uAmbientColor;
-
-  uniform vec3 uPointLightingLocation;
-  uniform vec3 uPointLightingColor;
-
-  uniform sampler2D uSampler;
-
-
-  void main(void) {
-    vec3 lightWeighting;
-    if (!uUseLighting) {
-      lightWeighting = vec3(1.0, 1.0, 1.0);
-    } else {
-      vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
-
-      float directionalLightWeighting = max(dot(normalize(vTransformedNormal.xyz), lightDirection), 0.0);
-      lightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;
-    }
-
-    vec4 fragmentColor;
-    if (uUseTextures) {
-      fragmentColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-    } else {
-      fragmentColor = vec4(1.0, 1.0, 1.0, 1.0);
-    }
-    gl_FragColor = vec4(fragmentColor.rgb * lightWeighting, fragmentColor.a);
-  }
-</script>
-
-<script id="per-fragment-lighting-vs" type="x-shader/x-vertex">
-  attribute vec3 aVertexPosition;
-  attribute vec3 aVertexNormal;
-  attribute vec2 aTextureCoord;
-
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
-  uniform mat4 uNMatrix;
-
-  varying vec2 vTextureCoord;
-  varying vec4 vTransformedNormal;
-  varying vec4 vPosition;
-
-
-  void main(void) {
-    vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-    gl_Position = uPMatrix * vPosition;
-    vTextureCoord = aTextureCoord;
-    vTransformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);
-  }
-</script>
-
-
-<script id="shader-fs" type="x-shader/x-fragment">
-  #ifdef GL_ES
-  precision highp float;
-  #endif
-
-  uniform bool uUseTextures;
-
-  varying vec2 vTextureCoord;
-  varying vec3 vLightWeighting;
-
-  uniform sampler2D uSampler;
-
-  void main(void) {
-     vec4 textureColor;
-     if (uUseTextures) {
-        textureColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));
-     }
-     else {
-        textureColor = vec4(1.0,1.0,1.0,1.0);
-     }
-     gl_FragColor = vec4(textureColor.rgb * vLightWeighting, textureColor.a);
-  }
-</script>
-
-<script id="shader-vs" type="x-shader/x-vertex">
-  attribute vec3 aVertexPosition;
-  attribute vec3 aVertexNormal;
-  attribute vec2 aTextureCoord;
-
-  uniform mat4 uMVMatrix;
-  uniform mat4 uPMatrix;
-  uniform mat4 uNMatrix;
-
-  uniform vec3 uAmbientColor;
-
-  uniform vec3 uPointLightingLocation;
-  uniform vec3 uPointLightingColor;
-
-  uniform bool uUseLighting;
-
-  varying vec2 vTextureCoord;
-  varying vec3 vLightWeighting;
-
-  void main(void) {
-    vec4 mvPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-    gl_Position = uPMatrix * mvPosition;
-    vTextureCoord = aTextureCoord;
-
-    if (!uUseLighting) {
-      vLightWeighting = vec3(1.0, 1.0, 1.0);
-    } else {
-/*      vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);
-
-
-      vec4 transformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);
-      float directionalLightWeighting = max(dot(transformedNormal.xyz, lightDirection), 0.0);
-      vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;
-      
-      */
-      vec3 lightDirection = normalize(uPointLightingLocation - aVertexPosition);
-      // light intensity as inverse of distance
-      //float lightDistance = sqrt((uPointLightingLocation.x - aVertexPosition.x)**2) +
-       //                         (uPointLightingLocation.y - aVertexPosition.y)**2) +
-        //                        (uPointLightingLocation.z - aVertexPosition.z)**2));
-      //vec3 lightIntensity = max(1.0 / (uPointLightingLocation - aVertexPosition), 0.0);
-      //vec3 lightDirection = normalize(uPointLightingLocation - mvPosition.xyz);
-      
-      vec4 transformedNormal = vec4(aVertexNormal, 1.0); // * uNMatrix
-      float directionalLightWeighting = max(dot(transformedNormal.xyz, lightDirection), 0.0);
-      //float distanceLightWeighting = ;
-      vLightWeighting = uAmbientColor + uPointLightingColor * directionalLightWeighting;// distanceLightWeighting *;
-      
-    }
-  }
-</script>
-
+<script id="per-fragment-spotlight-fs" type="x-shader/x-fragment" src="includes/spotlight-fs.frag"></script>
+<script id="per-fragment-spotlight-vs" type="x-shader/x-vertex" src="includes/spotlight-vs.vert"></script>
+<script id="per-fragment-lighting-fs" type="x-shader/x-fragment" src="includes/lighting-fs.frag"></script>
+<script id="per-fragment-lighting-vs" type="x-shader/x-vertex" src="includes/lighting-vs.vert"></script>
+<script id="shader-fs" type="x-shader/x-fragment" src="includes/shader-fs.frag"></script>
+<script id="shader-vs" type="x-shader/x-vertex" src="includes/shader-vs.vert"></script>
 
 <script type="text/javascript">
-
   var gl;
   function initGL(canvas) {
     try {
@@ -372,76 +30,76 @@ void main()
   }
 
 
-  function getShader(gl, id) {
+  function getShader(gl, id, cb) {
     var shaderScript = document.getElementById(id);
     if (!shaderScript) {
       return null;
     }
+    
+    $.ajax({
+      url: shaderScript.src,
+      dataType: "text",
+      success: function(data) {
+        var shader;
+        if (shaderScript.type == "x-shader/x-fragment") {
+          shader = gl.createShader(gl.FRAGMENT_SHADER);
+        } else if (shaderScript.type == "x-shader/x-vertex") {
+          shader = gl.createShader(gl.VERTEX_SHADER);
+        } else {
+          cb(null);
+        }
+        
+        gl.shaderSource(shader, data);
+        gl.compileShader(shader);
 
-    var str = "";
-    var k = shaderScript.firstChild;
-    while (k) {
-      if (k.nodeType == 3) {
-        str += k.textContent;
+        if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+          console.error("Error compiling shader: "+gl.getShaderInfoLog(shader));
+          cb(null);
+        }
+        
+        cb(shader);
+      },
+      error: function(xhr, textStatus, errorThrown) {
+        console.error("Error: Unable to get shader "+id);
       }
-      k = k.nextSibling;
-    }
-
-    var shader;
-    if (shaderScript.type == "x-shader/x-fragment") {
-      shader = gl.createShader(gl.FRAGMENT_SHADER);
-    } else if (shaderScript.type == "x-shader/x-vertex") {
-      shader = gl.createShader(gl.VERTEX_SHADER);
-    } else {
-      return null;
-    }
-
-    gl.shaderSource(shader, str);
-    gl.compileShader(shader);
-
-    if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-      alert(gl.getShaderInfoLog(shader));
-      return null;
-    }
-
-    return shader;
+    });
   }
-
   
-  function createProgram(fragmentShaderID, vertexShaderID) {
-    var fragmentShader = getShader(gl, fragmentShaderID);
-    var vertexShader = getShader(gl, vertexShaderID);
+  function createProgram(fragmentShaderID, vertexShaderID, cb) {
+    getShader(gl, fragmentShaderID, function(fragmentShader) {
+      getShader(gl, vertexShaderID, function(vertexShader) {
+        var program = gl.createProgram();
+        gl.attachShader(program, vertexShader);
+        gl.attachShader(program, fragmentShader);
+        gl.linkProgram(program);
 
-    var program = gl.createProgram();
-    gl.attachShader(program, vertexShader);
-    gl.attachShader(program, fragmentShader);
-    gl.linkProgram(program);
+        if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+          alert("Could not initialise shaders");
+        }
 
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-      alert("Could not initialise shaders");
-    }
+        program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
+        gl.enableVertexAttribArray(program.vertexPositionAttribute);
 
-    program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
-    gl.enableVertexAttribArray(program.vertexPositionAttribute);
+        program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
+        gl.enableVertexAttribArray(program.vertexNormalAttribute);
 
-    program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
-    gl.enableVertexAttribArray(program.vertexNormalAttribute);
+        program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
+        gl.enableVertexAttribArray(program.textureCoordAttribute);
 
-    program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
-    gl.enableVertexAttribArray(program.textureCoordAttribute);
+        program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
+        program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
+        program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
+        program.samplerUniform = gl.getUniformLocation(program, "uSampler");
+        program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
+        program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
+        program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
+        program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
+        program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
+        program.pointLightingDirectionUniform = gl.getUniformLocation(program, "uPointLightingDirection");
 
-    program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
-    program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
-    program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
-    program.samplerUniform = gl.getUniformLocation(program, "uSampler");
-    program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
-    program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
-    program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
-    program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
-    program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
-    program.pointLightingDirectionUniform = gl.getUniformLocation(program, "uPointLightingDirection");
-
-    return program;
+        cb(program);
+      });
+    });
   }
 
 
@@ -449,10 +107,17 @@ void main()
   var perVertexProgram;
   var perFragmentProgram;
   var spotlightProgram;
-  function initShaders() {
-    perFragmentProgram = createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs");
-    spotlightProgram = createProgram("per-fragment-spotlight-fs", "per-fragment-spotlight-vs");
-    perVertexProgram = createProgram("shader-fs", "shader-vs");
+  function initShaders(cb) {
+    createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs", function(prog) {
+      perFragmentProgram = prog;
+      createProgram("per-fragment-spotlight-fs", "per-fragment-spotlight-vs", function(prog) {
+        spotlightProgram = prog;
+        createProgram("shader-fs", "shader-vs", function(prog) {
+          perVertexProgram = prog;
+          cb();
+        });
+      });
+    });
   }
   
 
@@ -709,25 +374,7 @@ void main()
       currentProgram = spotlightProgram;
     }
     gl.useProgram(currentProgram);
-
-
-function getRadioCheckedValue(radio_name) {
-var oRadio = document.forms[0].elements[radio_name];
-
-for(var i = 0; i < oRadio.length; i++) { 
-
-if(oRadio[i].checked) {
-return oRadio[i].value;
-}
-
-}
-
-return '';
-}
-
-
-
-
+    
 
     var lighting = document.getElementById("lighting").checked;
     gl.uniform1i(currentProgram.useLightingUniform, lighting);
@@ -823,62 +470,59 @@ return '';
     lastTime = timeNow;
   }
 
-
   function tick() {
     handleKeys();
     drawScene();
     animate();
   }
 
-
-
   function webGLStart() {
     var canvas = document.getElementById("lesson10.5-canvas");
     initGL(canvas);
-    initShaders();
-    initTexture();
-    loadWorld();
+    initShaders(function() {
+      initTexture();
+      loadWorld();
 
-    gl.clearColor(0.0, 0.0, 0.0, 1.0);
+      gl.clearColor(0.0, 0.0, 0.0, 1.0);
 
-    gl.clearDepth(1.0);
+      gl.clearDepth(1.0);
 
-    gl.enable(gl.DEPTH_TEST);
-    gl.depthFunc(gl.LEQUAL)
-    
-    gl.enable(gl.CULL_FACE);
+      gl.enable(gl.DEPTH_TEST);
+      gl.depthFunc(gl.LEQUAL)
 
-    //gl.enable(gl.LIGHTING);
-    
-    document.onkeydown = handleKeyDown;
-    document.onkeyup = handleKeyUp;
+      gl.enable(gl.CULL_FACE);
 
-    setInterval(tick, 15);
+      //gl.enable(gl.LIGHTING);
+
+      document.onkeydown = handleKeyDown;
+      document.onkeyup = handleKeyUp;
+
+      setInterval(tick, 15);
+    });
   }
-
-
-
 </script>
 
 <style type="text/css">
-    #loadingtext {
-        position:absolute;
-        top:250px;
-        left:150px;
-        font-size:2em;
-        color: white;
-    }
+  #loadingtext {
+      position:absolute;
+      top:250px;
+      left:150px;
+      font-size:2em;
+      color: white;
+  }
+  body {
+    font-size: 11px;
+    font-family: "Lucida Grande";
+  }
+  h2 {
+    font-size: 14px;
+    margin-bottom: 0;
+  }
 </style>
-
-
-
 </head>
 
-
 <body onload="webGLStart();">
-<a href="http://learningwebgl.com/blog/?p=1198">&lt;&lt; Back to Lesson 10.5</a><br />
-
-  <canvas id="lesson10.5-canvas" style="border: none;" width="500" height="500"></canvas>
+  <canvas id="lesson10.5-canvas" style="border: none;" width="800" height="500"></canvas>
 
   <div id="loadingtext">Loading world...</div>
 
@@ -887,31 +531,31 @@ Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page D
 look up and down.<br/>
   <br/>
 
-<input type="checkbox" id="lighting" checked /> Use lighting<br/>
-<input type="checkbox" id="textures" checked /> Use textures<br/>
+<input type="checkbox" id="lighting" checked /> Use lighting
+<input type="checkbox" id="textures" checked /> Use textures
 Shader program:
 <input type="radio" name="shader" id="per-vertex-radio" value="per-vertex" /> Per-vertex
-<input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" /> Per-fragment
+<input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment
 <input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight
 <br/>
-<h2>Point light:</h2>
 
+<h2>Point light</h2>
 <table style="border: 0; padding: 10px;">
 <tr>
-<td><b>Position:</b>
+<td><b>Position</b>
 <td>X: <input type="text" id="lightPositionX" value="-0.25" />
 <td>Y: <input type="text" id="lightPositionY" value="-0.25" />
 <td>Z: <input type="text" id="lightPositionZ" value="-1.0" />
 </tr>
 <tr>
-<td><b>Colour:</b>
+<td><b>Colour</b>
 <td>R: <input type="text" id="pointR" value="0.8" />
 <td>G: <input type="text" id="pointG" value="0.8" />
 <td>B: <input type="text" id="pointB" value="0.8" />
 </tr>
 </table>
 
-<h2>Ambient light:</h2>
+<h2>Ambient light</h2>
 <table style="border: 0; padding: 10px;">
 <tr>
 <td><b>Colour:</b>
@@ -920,7 +564,7 @@ Shader program:
 <td>B: <input type="text" id="ambientB" value="0.2" />
 </tr>
 </table>
-<h2>Spotlight Direction:</h2>
+<h2>Spotlight Direction</h2>
 <table style="border: 0; padding: 10px;">
 <tr>
 <td>X: <input type="text" id="directionX" value="0.2" />
@@ -928,11 +572,6 @@ Shader program:
 <td>Z: <input type="text" id="directionZ" value="0.2" />
 </tr>
 </table>
-
-
-<br/>
-<br/>
-<a href="http://learningwebgl.com/blog/?p=1198">&lt;&lt; Back to Lesson 10.5</a>
 
 </body>
 
