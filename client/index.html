@@ -153,7 +153,7 @@
       handleLoadedTexture(neheTexture)
     }
 
-    neheTexture.image.src = "Stravinsky_picasso.png"; 
+    neheTexture.image.src = "mud.gif"; //"Stravinsky_picasso.png"; 
     
   }
 
@@ -433,6 +433,8 @@
 
           // Add front and back-facing triangles
           addTriangleToLists(currentTriangle, normal, false);
+          // TODO(kozzles): better solution to painting "reflection" error than
+          // doing backfacing triangles twice??
           addTriangleToLists(currentTriangle, normal, true);
 
           currentTriangle = [];
@@ -553,7 +555,7 @@
     mvRotate(-yaw, [0, 1, 0]);
     mvTranslate([-xPos, -yPos, -zPos]);
 
-		mvPushMatrix();
+    mvPushMatrix();
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, mudTexture);
@@ -574,8 +576,8 @@
     mvPopMatrix();
     
     // for the painting YBY
-		
-		mvPushMatrix();
+    
+    mvPushMatrix();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
     gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
@@ -591,7 +593,7 @@
     setMatrixUniforms();
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
-		mvPopMatrix();
+    mvPopMatrix();
     
     
   }
