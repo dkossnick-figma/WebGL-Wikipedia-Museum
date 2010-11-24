@@ -469,7 +469,7 @@ void main()
   }
 
 
-  var mudTexture;
+  var mudTexture, neheTexture;
   function initTexture() {
     mudTexture = gl.createTexture();
     mudTexture.image = new Image();
@@ -478,6 +478,15 @@ void main()
     }
 
     mudTexture.image.src = "mud.gif";
+    
+    neheTexture = gl.createTexture();
+    neheTexture.image = new Image();
+    neheTexture.image.onload = function() {
+      handleLoadedTexture(neheTexture)
+    }
+
+    neheTexture.image.src = "Stravinsky_picasso.png"; 
+    
   }
 
 
@@ -593,6 +602,115 @@ void main()
     }
 
   }
+
+
+	// BEGIN YBY painting-related buffers
+  var cubeVertexPositionBuffer;
+  var cubeVertexTextureCoordBuffer;
+  var cubeVertexIndexBuffer;
+  function initBuffers() {
+    cubeVertexPositionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+    vertices = [
+      // Front face
+      0.75, 0.25,  -1.75,
+       1.25, 0.25,  -1.75,
+       1.25,  0.75,  -1.75,
+      0.75,  0.75,  -1.75,
+
+      // Back face
+      0.75, 0.25, -1.8,
+      0.75,  0.75, -1.8,
+       1.25,  0.75, -1.8,
+       1.25, 0.25, -1.8,
+
+      // Top face
+      0.75,  0.75, -1.8,
+      0.75,  0.75,  -1.75,
+       1.25,  0.75,  -1.75,
+       1.25,  0.75, -1.8,
+
+      // Bottom face
+      0.75, 0.25, -1.8,
+       1.25, 0.25, -1.8,
+       1.25, 0.25,  -1.75,
+      0.75, 0.25,  -1.75,
+
+      // Right face
+       1.25, 0.25, -1.8,
+       1.25,  0.75, -1.8,
+       1.25,  0.75,  -1.75,
+       1.25, 0.25,  -1.75,
+
+      // Left face
+      0.75, 0.25, -1.8,
+      0.75, 0.25,  -1.75,
+      0.75,  0.75,  -1.75,
+      0.75,  0.75, -1.8,
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+    cubeVertexPositionBuffer.itemSize = 3;
+    cubeVertexPositionBuffer.numItems = 24;
+
+    cubeVertexTextureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+    var textureCoords = [
+      // Front face
+      0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+      0.0, 1.0,
+
+      // Back face
+      1.0, 0.0,
+      1.0, 1.0,
+      0.0, 1.0,
+      0.0, 0.0,
+
+      // Top face
+      0.0, 1.0,
+      0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+
+      // Bottom face
+      1.0, 1.0,
+      0.0, 1.0,
+      0.0, 0.0,
+      1.0, 0.0,
+
+      // Right face
+      1.0, 0.0,
+      1.0, 1.0,
+      0.0, 1.0,
+      0.0, 0.0,
+
+      // Left face
+      0.0, 0.0,
+      1.0, 0.0,
+      1.0, 1.0,
+      0.0, 1.0,
+    ];
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoords), gl.STATIC_DRAW);
+    cubeVertexTextureCoordBuffer.itemSize = 2;
+    cubeVertexTextureCoordBuffer.numItems = 24;
+
+    cubeVertexIndexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+    var cubeVertexIndices = [
+      0, 1, 2,      0, 2, 3,    // Front face
+      4, 5, 6,      4, 6, 7,    // Back face
+      8, 9, 10,     8, 10, 11,  // Top face
+      12, 13, 14,   12, 14, 15, // Bottom face
+      16, 17, 18,   16, 18, 19, // Right face
+      20, 21, 22,   20, 22, 23  // Left face
+    ]
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+    cubeVertexIndexBuffer.itemSize = 1;
+    cubeVertexIndexBuffer.numItems = 36;
+  }
+	// END YBY ohai
+
 
 
 
@@ -770,6 +888,7 @@ return '';
     mvRotate(-yaw, [0, 1, 0]);
     mvTranslate([-xPos, -yPos, -zPos]);
 
+		mvPushMatrix();
 
     gl.activeTexture(gl.TEXTURE0);
     gl.bindTexture(gl.TEXTURE_2D, mudTexture);
@@ -786,6 +905,30 @@ return '';
 
     setMatrixUniforms();
     gl.drawArrays(gl.TRIANGLES, 0, worldVertexPositionBuffer.numItems);
+    
+    mvPopMatrix();
+    
+    // for the painting YBY
+		
+		mvPushMatrix();
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, cubeVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexTextureCoordBuffer);
+    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+    gl.uniform1i(currentProgram.samplerUniform, 0);
+
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
+    setMatrixUniforms();
+    gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+
+		mvPopMatrix();
+    
+    
   }
 
 
@@ -837,6 +980,10 @@ return '';
     initGL(canvas);
     initShaders();
     initTexture();
+    
+    // init the cube variables here
+    initBuffers();    
+    
     loadWorld();
 
     gl.clearColor(0.0, 0.0, 0.0, 1.0);
