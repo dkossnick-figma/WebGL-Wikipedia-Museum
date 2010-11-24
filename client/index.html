@@ -437,6 +437,8 @@
 
           // Add front and back-facing triangles
           addTriangleToLists(currentTriangle, normal, false);
+          // TODO(kozzles): better solution to painting "reflection" error than
+          // doing backfacing triangles twice??
           addTriangleToLists(currentTriangle, normal, true);
 
           currentTriangle = [];
@@ -566,7 +568,7 @@
     mvRotate(-yaw, [0, 1, 0]);
     mvTranslate([-xPos, -yPos, -zPos]);
 
-		mvPushMatrix();
+    mvPushMatrix();
 
     // Render the walls
     gl.activeTexture(gl.TEXTURE0);
@@ -608,7 +610,6 @@
     mvPopMatrix();
 
     // for the painting YBY
-
 		mvPushMatrix();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
