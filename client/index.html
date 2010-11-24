@@ -15,8 +15,11 @@
 <script id="shader-fs" type="x-shader/x-fragment" src="includes/shader-fs.frag"></script>
 <script id="shader-vs" type="x-shader/x-vertex" src="includes/shader-vs.vert"></script>
 
+<script type="text/javascript" src="includes/Room.js"></script>
+
 <script type="text/javascript">
   var gl;
+
   function initGL(canvas) {
     try {
       gl = canvas.getContext("experimental-webgl");
@@ -129,34 +132,41 @@
     gl.bindTexture(gl.TEXTURE_2D, texture);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.generateMipmap(gl.TEXTURE_2D);
 
 
     gl.bindTexture(gl.TEXTURE_2D, null);
   }
 
-
-  var mudTexture, neheTexture;
   function initTexture() {
-    mudTexture = gl.createTexture();
-    mudTexture.image = new Image();
-    mudTexture.image.onload = function() {
-      handleLoadedTexture(mudTexture)
+    // Load wall texture
+    Room.walls.texture = gl.createTexture();
+    Room.walls.texture.image = new Image();
+    Room.walls.texture.image.onload = function() {
+      handleLoadedTexture(Room.walls.texture)
     }
 
-    mudTexture.image.src = "mud.gif";
-    
-    neheTexture = gl.createTexture();
-    neheTexture.image = new Image();
-    neheTexture.image.onload = function() {
-      handleLoadedTexture(neheTexture)
+    Room.walls.texture.image.src = "mud.gif";
+
+    // Load floor texture
+    Room.floor.texture = gl.createTexture();
+    Room.floor.texture.image = new Image();
+    Room.floor.texture.image.onload = function() {
+      handleLoadedTexture(Room.floor.texture)
     }
 
-    neheTexture.image.src = "Stravinsky_picasso.png"; 
-    
+    Room.floor.texture.image.src = "stone.jpg";
+
+    // Load TEMP texture
+    Room.TEMPtexture = gl.createTexture();
+    Room.TEMPtexture.image = new Image();
+    Room.TEMPtexture.image.onload = function() {
+      handleLoadedTexture(Room.TEMPtexture)
+    }
+
+    Room.TEMPtexture.image.src = "stone.jpg";
   }
-
 
   var mvMatrix;
   var mvMatrixStack = [];
@@ -281,41 +291,41 @@
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
     vertices = [
       // Front face
-      0.75, 0.25,  -1.75,
-       1.25, 0.25,  -1.75,
-       1.25,  0.75,  -1.75,
-      0.75,  0.75,  -1.75,
+      -0.25, 0.25,  -2.95,
+      0.25, 0.25,  -2.95,
+      0.25,  0.75,  -2.95,
+      -0.25,  0.75,  -2.95,
 
       // Back face
-      0.75, 0.25, -1.8,
-      0.75,  0.75, -1.8,
-       1.25,  0.75, -1.8,
-       1.25, 0.25, -1.8,
+      -0.25, 0.25, -3.0,
+      -0.25,  0.75, -3.0,
+      0.25,  0.75, -3.0,
+      0.25, 0.25, -3.0,
 
       // Top face
-      0.75,  0.75, -1.8,
-      0.75,  0.75,  -1.75,
-       1.25,  0.75,  -1.75,
-       1.25,  0.75, -1.8,
+      -0.25,  0.75, -3.0,
+      -0.25,  0.75,  -2.95,
+      0.25,  0.75,  -2.95,
+      0.25,  0.75, -3.0,
 
       // Bottom face
-      0.75, 0.25, -1.8,
-       1.25, 0.25, -1.8,
-       1.25, 0.25,  -1.75,
-      0.75, 0.25,  -1.75,
+      -0.25, 0.25, -3.0,
+      0.25, 0.25, -3.0,
+      0.25, 0.25,  -2.95,
+      -0.25, 0.25,  -2.95,
 
       // Right face
-       1.25, 0.25, -1.8,
-       1.25,  0.75, -1.8,
-       1.25,  0.75,  -1.75,
-       1.25, 0.25,  -1.75,
+      0.25, 0.25, -3.0,
+      0.25,  0.75, -3.0,
+      0.25,  0.75,  -2.95,
+      0.25, 0.25,  -2.95,
 
       // Left face
-      0.75, 0.25, -1.8,
-      0.75, 0.25,  -1.75,
-      0.75,  0.75,  -1.75,
-      0.75,  0.75, -1.8,
-    ];
+      -0.25, 0.25, -3.0,
+      -0.25, 0.25,  -2.95,
+      -0.25,  0.75,  -2.95,
+      -0.25,  0.75, -3.0,
+     ];
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
     cubeVertexPositionBuffer.itemSize = 3;
     cubeVertexPositionBuffer.numItems = 24;
@@ -379,16 +389,10 @@
   }
 	// END YBY ohai
 
-
-
-
-  var worldVertexPositionBuffer = null;
-  var worldVertexTextureCoordBuffer = null;
-  var worldVertexNormalBuffer = null;
-  var vertexPositions = [];
-  function handleLoadedWorld(data) {
+  function handleLoadedWorld(component, data) {
     var lines = data.split("\n");
     var vertexCount = 0;
+    var vertexPositions = [];
     var vertexTextureCoords = [];
     var vertexNormals = [];
     var currentTriangle = []
@@ -442,46 +446,55 @@
 
     }
 
-    worldVertexPositionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexPositionBuffer);
+    component.positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.positionBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
-    worldVertexPositionBuffer.itemSize = 3;
-    worldVertexPositionBuffer.numItems = vertexCount;
+    component.positionBuffer.itemSize = 3;
+    component.positionBuffer.numItems = vertexCount;
 
-    worldVertexTextureCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexTextureCoordBuffer);
+    component.textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.textureCoordBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
-    worldVertexTextureCoordBuffer.itemSize = 2;
-    worldVertexTextureCoordBuffer.numItems = vertexCount;
+    component.textureCoordBuffer.itemSize = 2;
+    component.textureCoordBuffer.numItems = vertexCount;
 
-    worldVertexNormalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexNormalBuffer);
+    component.normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.normalBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-    worldVertexNormalBuffer.itemSize = 3;
-    worldVertexNormalBuffer.numItems = vertexCount;
+    component.normalBuffer.itemSize = 3;
+    component.normalBuffer.numItems = vertexCount;
 
     document.getElementById("loadingtext").textContent = "";
   }
 
-
   function loadWorld() {
-    var request = new XMLHttpRequest();
-    request.open("GET", "world.txt");
-    request.onreadystatechange = function() {
-      if (request.readyState == 4) {
-        handleLoadedWorld(request.responseText);
+    $.ajax({
+      url: "world.txt",
+      dataType: "text",
+      success: function(data) {
+        handleLoadedWorld(Room.walls, data);
       }
-    }
-    request.send();
+    });
+
+    $.ajax({
+      url: "floor.txt",
+      dataType: "text",
+      success: function(data) {
+        handleLoadedWorld(Room.floor, data);
+      }
+    });
   }
-
-
 
   function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if (worldVertexTextureCoordBuffer == null || worldVertexNormalBuffer == null || worldVertexPositionBuffer == null) {
+    if (Room.walls.textureCoordBuffer == null ||
+        Room.walls.normalBuffer == null ||
+        Room.walls.positionBuffer == null ||
+        Room.floor.textureCoordBuffer == null ||
+        Room.floor.normalBuffer == null ||
+        Room.floor.positionBuffer == null) {
       return;
     }
 
@@ -495,7 +508,7 @@
       currentProgram = spotlightProgram;
     }
     gl.useProgram(currentProgram);
-    
+
 
     var lighting = document.getElementById("lighting").checked;
     gl.uniform1i(currentProgram.useLightingUniform, lighting);
@@ -555,26 +568,47 @@
 
 		mvPushMatrix();
 
+    // Render the walls
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, mudTexture);
+    gl.bindTexture(gl.TEXTURE_2D, Room.walls.texture);
     gl.uniform1i(currentProgram.samplerUniform, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexTextureCoordBuffer);
-    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, worldVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.textureCoordBuffer);
+    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, Room.walls.textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexNormalBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, worldVertexNormalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.normalBuffer);
+    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, Room.walls.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
-    gl.bindBuffer(gl.ARRAY_BUFFER, worldVertexPositionBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, worldVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.positionBuffer);
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, Room.walls.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, worldVertexPositionBuffer.numItems);
-    
+    gl.drawArrays(gl.TRIANGLES, 0, Room.walls.positionBuffer.numItems);
+
     mvPopMatrix();
-    
+    mvPushMatrix();
+
+    // Render the floor
+    gl.activeTexture(gl.TEXTURE0);
+    gl.bindTexture(gl.TEXTURE_2D, Room.floor.texture);
+    gl.uniform1i(currentProgram.samplerUniform, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.textureCoordBuffer);
+    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, Room.floor.textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.normalBuffer);
+    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, Room.floor.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.positionBuffer);
+    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, Room.floor.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+
+    setMatrixUniforms();
+    gl.drawArrays(gl.TRIANGLES, 0, Room.floor.positionBuffer.numItems);
+
+    mvPopMatrix();
+
     // for the painting YBY
-		
+
 		mvPushMatrix();
 
     gl.bindBuffer(gl.ARRAY_BUFFER, cubeVertexPositionBuffer);
@@ -584,7 +618,7 @@
     gl.vertexAttribPointer(currentProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, neheTexture);
+    gl.bindTexture(gl.TEXTURE_2D, Room.TEMPtexture);
     gl.uniform1i(currentProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
@@ -592,8 +626,6 @@
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
 		mvPopMatrix();
-    
-    
   }
 
 
