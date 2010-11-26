@@ -10,9 +10,12 @@
 <script type="text/javascript" src="includes/glUtils.js"></script>
 
 <script type="text/javascript" src="includes/Room.js"></script>
+<script type="text/javascript" src="includes/Matrix.js"></script>
 <script type="text/javascript" src="includes/Movement.js"></script>
+<script type="text/javascript" src="includes/WAG.js"></script>
 
 <script type="text/javascript">
+  var WAGinstance;
   var gl;
 
   var WAGConfig = {
@@ -31,19 +34,6 @@
       }
     }
   }
-
-  function initGL(canvas) {
-    try {
-      gl = canvas.getContext("experimental-webgl");
-      gl.viewportWidth = canvas.width;
-      gl.viewportHeight = canvas.height;
-    } catch(e) {
-    }
-    if (!gl) {
-      alert("Could not initialise WebGL, sorry :-(");
-    }
-  }
-
 
   function getShader(gl, id, shader_type, cb) {
     var shaderScript = WAGConfig.programs[id];
@@ -179,52 +169,6 @@
 
     Room.TEMPtexture.image.src = "stone.jpg";
   }
-
-  var mvMatrix;
-  var mvMatrixStack = [];
-
-  function mvPushMatrix(m) {
-    if (m) {
-      mvMatrixStack.push(m.dup());
-      mvMatrix = m.dup();
-    } else {
-      mvMatrixStack.push(mvMatrix.dup());
-    }
-  }
-
-  function mvPopMatrix() {
-    if (mvMatrixStack.length == 0) {
-      throw "Invalid popMatrix!";
-    }
-    mvMatrix = mvMatrixStack.pop();
-    return mvMatrix;
-  }
-
-  function loadIdentity() {
-    mvMatrix = Matrix.I(4);
-  }
-
-
-  function multMatrix(m) {
-    mvMatrix = mvMatrix.x(m);
-  }
-
-  function mvTranslate(v) {
-    var m = Matrix.Translation($V([v[0], v[1], v[2]])).ensure4x4();
-    multMatrix(m);
-  }
-
-  function mvRotate(ang, v) {
-    var arad = ang * Math.PI / 180.0;
-    var m = Matrix.Rotation(arad, $V([v[0], v[1], v[2]])).ensure4x4();
-    multMatrix(m);
-  }
-
-  var pMatrix;
-  function perspective(fovy, aspect, znear, zfar) {
-    pMatrix = makePerspective(fovy, aspect, znear, zfar);
-  }
-
 
   function setMatrixUniforms() {
     gl.uniformMatrix4fv(currentProgram.pMatrixUniform, false, new Float32Array(pMatrix.flatten()));
@@ -398,7 +342,6 @@
           vertexCount += 6;
         }
       }
-
     }
 
     component.positionBuffer = gl.createBuffer();
@@ -420,24 +363,6 @@
     component.normalBuffer.numItems = vertexCount;
 
     document.getElementById("loadingtext").textContent = "";
-  }
-
-  function loadWorld() {
-    $.ajax({
-      url: "world.txt",
-      dataType: "text",
-      success: function(data) {
-        handleLoadedWorld(Room.walls, data);
-      }
-    });
-
-    $.ajax({
-      url: "floor.txt",
-      dataType: "text",
-      success: function(data) {
-        handleLoadedWorld(Room.floor, data);
-      }
-    });
   }
 
   function drawScene() {
@@ -587,40 +512,11 @@
     drawScene();
     animate();
   }
-
-  function webGLStart() {
-    var canvas = document.getElementById("lesson10.5-canvas");
-    initGL(canvas);
-    initShaders(function() {
-      initTexture();
-      
-      // init the cube variables here
-    	initBuffers();
-      
-      loadWorld();
-
-      gl.clearColor(0.0, 0.0, 0.0, 1.0);
-
-      gl.clearDepth(1.0);
-
-      gl.enable(gl.DEPTH_TEST);
-      gl.depthFunc(gl.LEQUAL)
-
-      gl.enable(gl.CULL_FACE);
-
-      //gl.enable(gl.LIGHTING);
-
-      document.onkeydown = handleKeyDown;
-      document.onkeyup = handleKeyUp;
-
-      setInterval(tick, 15);
-    });
-  }
 </script>
 </head>
 
-<body onload="webGLStart();">
-  <canvas id="lesson10.5-canvas" style="border: none;" width="800" height="500"></canvas>
+<body>
+  <canvas id="wagCanvas" style="border: none;" width="800" height="500"></canvas>
 
   <div id="loadingtext">Loading world...</div>
 
