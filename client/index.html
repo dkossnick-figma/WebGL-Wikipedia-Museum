@@ -18,6 +18,11 @@
   var WAGinstance;
   var gl;
 
+  var currentProgram;
+  var perVertexProgram;
+  var perFragmentProgram;
+  var spotlightProgram;
+
   var WAGConfig = {
     programs: {
       perVertex: {
@@ -110,25 +115,6 @@
     });
   }
 
-
-  var currentProgram;
-  var perVertexProgram;
-  var perFragmentProgram;
-  var spotlightProgram;
-  function initShaders(cb) {
-    createProgram("perFragment", function(prog) {
-      perFragmentProgram = prog;
-      createProgram("spotlight", function(prog) {
-        spotlightProgram = prog;
-        createProgram("perVertex", function(prog) {
-          perVertexProgram = prog;
-          cb();
-        });
-      });
-    });
-  }
-
-
   function handleLoadedTexture(texture) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -139,35 +125,6 @@
 
 
     gl.bindTexture(gl.TEXTURE_2D, null);
-  }
-
-  function initTexture() {
-    // Load wall texture
-    Room.walls.texture = gl.createTexture();
-    Room.walls.texture.image = new Image();
-    Room.walls.texture.image.onload = function() {
-      handleLoadedTexture(Room.walls.texture)
-    }
-
-    Room.walls.texture.image.src = "mud.gif";
-
-    // Load floor texture
-    Room.floor.texture = gl.createTexture();
-    Room.floor.texture.image = new Image();
-    Room.floor.texture.image.onload = function() {
-      handleLoadedTexture(Room.floor.texture)
-    }
-
-    Room.floor.texture.image.src = "stone.jpg";
-
-    // Load TEMP texture
-    Room.TEMPtexture = gl.createTexture();
-    Room.TEMPtexture.image = new Image();
-    Room.TEMPtexture.image.onload = function() {
-      handleLoadedTexture(Room.TEMPtexture)
-    }
-
-    Room.TEMPtexture.image.src = "stone.jpg";
   }
 
   function setMatrixUniforms() {

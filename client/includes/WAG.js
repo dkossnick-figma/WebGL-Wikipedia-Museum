@@ -12,8 +12,8 @@ function WAG(canvas) {
       alert("Could not initialise WebGL, sorry :-(");
     }
 
-    initShaders(function() {
-      initTexture();
+    this.initShaders(function() {
+      this.initTexture();
 
       // init the cube variables here
     	initBuffers();
@@ -55,6 +55,49 @@ function WAG(canvas) {
       }
     });
   }
+
+  this.initShaders = function(cb) {
+    createProgram("perFragment", function(prog) {
+      perFragmentProgram = prog;
+      createProgram("spotlight", function(prog) {
+        spotlightProgram = prog;
+        createProgram("perVertex", function(prog) {
+          perVertexProgram = prog;
+          cb();
+        });
+      });
+    });
+  }
+
+  this.initTexture = function() {
+    // Load wall texture
+    Room.walls.texture = gl.createTexture();
+    Room.walls.texture.image = new Image();
+    Room.walls.texture.image.onload = function() {
+      handleLoadedTexture(Room.walls.texture)
+    }
+
+    Room.walls.texture.image.src = "mud.gif";
+
+    // Load floor texture
+    Room.floor.texture = gl.createTexture();
+    Room.floor.texture.image = new Image();
+    Room.floor.texture.image.onload = function() {
+      handleLoadedTexture(Room.floor.texture)
+    }
+
+    Room.floor.texture.image.src = "stone.jpg";
+
+    // Load TEMP texture
+    Room.TEMPtexture = gl.createTexture();
+    Room.TEMPtexture.image = new Image();
+    Room.TEMPtexture.image.onload = function() {
+      handleLoadedTexture(Room.TEMPtexture)
+    }
+
+    Room.TEMPtexture.image.src = "stone.jpg";
+  }
+
 }
 
 $(document).ready(function() {
