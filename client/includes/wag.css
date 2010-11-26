@@ -1,0 +1,20 @@
+body {
+  font-size: 11px;
+  font-family: "Lucida Grande";
+}
+
+#loadingtext {
+  position:absolute;
+  top:250px;
+  left:150px;
+  font-size:2em;
+  color: white;
+}
+
+#parameterTable {
+  margin-top: 10px;
+}
+
+#parameterTable th {
+  text-align: left;
+}
