@@ -16,6 +16,7 @@
 
 <script type="text/javascript">
   var WAGinstance;
+  var room;
   var gl;
 
   var currentProgram;
@@ -243,95 +244,16 @@
   }
 	// END YBY ohai
 
-  function handleLoadedWorld(component, data) {
-    var lines = data.split("\n");
-    var vertexCount = 0;
-    var vertexPositions = [];
-    var vertexTextureCoords = [];
-    var vertexNormals = [];
-    var currentTriangle = []
-    function addTriangleToLists(triangle, normal, flip) {
-      if (flip) {
-        triangle = [triangle[0], triangle[2], triangle[1]];
-      } else {
-        normal = normal.x(-1);
-      }
-      for (var i in triangle) {
-        vertex = triangle[i];
-
-        vertexPositions.push(vertex.position.e(1));
-        vertexPositions.push(vertex.position.e(2));
-        vertexPositions.push(vertex.position.e(3));
-
-        vertexTextureCoords.push(vertex.textureCoords[0]);
-        vertexTextureCoords.push(vertex.textureCoords[1]);
-
-        vertexNormals.push(normal.e(1));
-        vertexNormals.push(normal.e(2));
-        vertexNormals.push(normal.e(3));
-      }
-    }
-
-
-    for (var i in lines) {
-      var vals = lines[i].replace(/^\s+/, "").split(/\s+/);
-      if (vals.length == 5 && vals[0] != "//") {
-        // It is a line describing a vertex.  Construct an object to
-        // represent it:
-        vertex = {
-          position : $V([parseFloat(vals[0]), parseFloat(vals[1]), parseFloat(vals[2])]),
-          textureCoords : [parseFloat(vals[3]), parseFloat(vals[4])]
-        };
-        currentTriangle.push(vertex);
-
-        if (currentTriangle.length == 3) {
-          var sideVector1 = currentTriangle[1].position.subtract(currentTriangle[0].position);
-          var sideVector2 = currentTriangle[0].position.subtract(currentTriangle[2].position);
-          var normal = sideVector1.cross(sideVector2).toUnitVector();
-
-          // Add front and back-facing triangles
-          addTriangleToLists(currentTriangle, normal, false);
-          // TODO(kozzles): better solution to painting "reflection" error than
-          // doing backfacing triangles twice??
-          addTriangleToLists(currentTriangle, normal, true);
-
-          currentTriangle = [];
-          vertexCount += 6;
-        }
-      }
-    }
-
-    component.positionBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, component.positionBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexPositions), gl.STATIC_DRAW);
-    component.positionBuffer.itemSize = 3;
-    component.positionBuffer.numItems = vertexCount;
-
-    component.textureCoordBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, component.textureCoordBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexTextureCoords), gl.STATIC_DRAW);
-    component.textureCoordBuffer.itemSize = 2;
-    component.textureCoordBuffer.numItems = vertexCount;
-
-    component.normalBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, component.normalBuffer);
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexNormals), gl.STATIC_DRAW);
-    component.normalBuffer.itemSize = 3;
-    component.normalBuffer.numItems = vertexCount;
-
-    document.getElementById("loadingtext").textContent = "";
-  }
-
   function drawScene() {
     gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-    if (Room.walls.textureCoordBuffer == null ||
-        Room.walls.normalBuffer == null ||
-        Room.walls.positionBuffer == null ||
-        Room.floor.textureCoordBuffer == null ||
-        Room.floor.normalBuffer == null ||
-        Room.floor.positionBuffer == null) {
+    if (room.walls.textureCoordBuffer == null ||
+        room.walls.normalBuffer == null ||
+        room.walls.positionBuffer == null ||
+        room.floor.textureCoordBuffer == null ||
+        room.floor.normalBuffer == null ||
+        room.floor.positionBuffer == null) {
       return;
     }
 
@@ -403,47 +325,9 @@
     mvRotate(-yaw, [0, 1, 0]);
     mvTranslate([-xPos, -yPos, -zPos]);
 
-    mvPushMatrix();
+    room.renderComponents();
 
-    // Render the walls
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, Room.walls.texture);
-    gl.uniform1i(currentProgram.samplerUniform, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.textureCoordBuffer);
-    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, Room.walls.textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.normalBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, Room.walls.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.walls.positionBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, Room.walls.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, Room.walls.positionBuffer.numItems);
-
-    mvPopMatrix();
-    mvPushMatrix();
-
-    // Render the floor
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, Room.floor.texture);
-    gl.uniform1i(currentProgram.samplerUniform, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.textureCoordBuffer);
-    gl.vertexAttribPointer(currentProgram.textureCoordAttribute, Room.floor.textureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.normalBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexNormalAttribute, Room.floor.normalBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    gl.bindBuffer(gl.ARRAY_BUFFER, Room.floor.positionBuffer);
-    gl.vertexAttribPointer(currentProgram.vertexPositionAttribute, Room.floor.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
-
-    setMatrixUniforms();
-    gl.drawArrays(gl.TRIANGLES, 0, Room.floor.positionBuffer.numItems);
-
-    mvPopMatrix();
-
+/*
     // for the painting YBY
 		mvPushMatrix();
 
@@ -454,7 +338,7 @@
     gl.vertexAttribPointer(currentProgram.textureCoordAttribute, cubeVertexTextureCoordBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, Room.TEMPtexture);
+    gl.bindTexture(gl.TEXTURE_2D, room.TEMPtexture);
     gl.uniform1i(currentProgram.samplerUniform, 0);
 
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVertexIndexBuffer);
@@ -462,6 +346,7 @@
     gl.drawElements(gl.TRIANGLES, cubeVertexIndexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
 
 		mvPopMatrix();
+*/
   }
 
   function tick() {
@@ -469,6 +354,15 @@
     drawScene();
     animate();
   }
+
+  $(document).ready(function() {
+    room = new Room(function() {
+      $('#loadingtext').hide();
+    });
+
+    WAGinstance = new WAG("wagCanvas");
+    WAGinstance.initialize();
+  });
 </script>
 </head>
 
