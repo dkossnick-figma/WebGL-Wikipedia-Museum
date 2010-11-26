@@ -3,6 +3,7 @@
 <head>
 <title>Wikipedia Art Gallery</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+<link rel="stylesheet" href="includes/wag.css" type="text/css" />
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="includes/sylvester.js"></script>
@@ -616,24 +617,6 @@
     });
   }
 </script>
-
-<style type="text/css">
-  #loadingtext {
-      position:absolute;
-      top:250px;
-      left:150px;
-      font-size:2em;
-      color: white;
-  }
-  body {
-    font-size: 11px;
-    font-family: "Lucida Grande";
-  }
-  h2 {
-    font-size: 14px;
-    margin-bottom: 0;
-  }
-</style>
 </head>
 
 <body onload="webGLStart();">
@@ -646,44 +629,44 @@ Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page D
 look up and down.<br/>
   <br/>
 
-<input type="checkbox" id="lighting" checked /> Use lighting
-<input type="checkbox" id="textures" checked /> Use textures
+<input type="checkbox" id="lighting" checked="checked" /> Use lighting
+<input type="checkbox" id="textures" checked="checked" /> Use textures
 Shader program:
 <input type="radio" name="shader" id="per-vertex-radio" value="per-vertex" /> Per-vertex
 <input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment
 <input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight
 <br/>
 
-<table style="border: 0; padding: 10px;">
+<table id="parameterTable">
 <tr>
-<td><b>Position:</b>
-<td>X: <input type="text" id="lightPositionX" value="-0.25" />
-<td>Y: <input type="text" id="lightPositionY" value="-0.25" />
-<td>Z: <input type="text" id="lightPositionZ" value="-1.0" />
+<th>Position:</th>
+<td>X: <input type="text" id="lightPositionX" value="-0.25" /></td>
+<td>Y: <input type="text" id="lightPositionY" value="-0.25" /></td>
+<td>Z: <input type="text" id="lightPositionZ" value="-1.0" /></td>
 </tr>
 <tr>
-<td><b>Colour</b>
-<td>R: <input type="text" id="pointR" value="0.8" />
-<td>G: <input type="text" id="pointG" value="0.8" />
-<td>B: <input type="text" id="pointB" value="0.8" />
+<th>Colour:</th>
+<td>R: <input type="text" id="pointR" value="0.8" /></td>
+<td>G: <input type="text" id="pointG" value="0.8" /></td>
+<td>B: <input type="text" id="pointB" value="0.8" /></td>
 </tr>
 <tr>
-<td><b>Ambient Colour:</b>
-<td>R: <input type="text" id="ambientR" value="0.2" />
-<td>G: <input type="text" id="ambientG" value="0.2" />
-<td>B: <input type="text" id="ambientB" value="0.2" />
+<th>Ambient Colour:</th>
+<td>R: <input type="text" id="ambientR" value="0.2" /></td>
+<td>G: <input type="text" id="ambientG" value="0.2" /></td>
+<td>B: <input type="text" id="ambientB" value="0.2" /></td>
 </tr>
 <tr>
-<td><b>Spotlight Direction:</b>
-<td>X: <input type="text" id="directionX" value="0.2" />
-<td>Y: <input type="text" id="directionY" value="0.2" />
-<td>Z: <input type="text" id="directionZ" value="0.2" />
+<th>Spotlight Direction:</th>
+<td>X: <input type="text" id="directionX" value="0.2" /></td>
+<td>Y: <input type="text" id="directionY" value="0.2" /></td>
+<td>Z: <input type="text" id="directionZ" value="0.2" /></td>
 </tr>
 <tr>
-<td><b>Spotlight Params:</b>
-<td>spotCosCutoff: <input type="text" id="spotCosCutoff" value="0.2" />
-<td>Cos Inner Cone Angle: <input type="text" id="cos_inner_cone_angle" value="0.2" />
-<td>Cos Outer Cone Angle: <input type="text" id="cos_outer_cone_angle" value="0.2" />
+<th>Spotlight Params:</th>
+<td>spotCosCutoff: <input type="text" id="spotCosCutoff" value="0.2" /></td>
+<td>Cos Inner Cone Angle: <input type="text" id="cos_inner_cone_angle" value="0.2" /></td>
+<td>Cos Outer Cone Angle: <input type="text" id="cos_outer_cone_angle" value="0.2" /></td>
 </tr>
 </table>
 
