@@ -8,17 +8,27 @@
 <script type="text/javascript" src="includes/sylvester.js"></script>
 <script type="text/javascript" src="includes/glUtils.js"></script>
 
-<script id="per-fragment-spotlight-fs" type="x-shader/x-fragment" src="includes/spotlight-fs.frag"></script>
-<script id="per-fragment-spotlight-vs" type="x-shader/x-vertex" src="includes/spotlight-vs.vert"></script>
-<script id="per-fragment-lighting-fs" type="x-shader/x-fragment" src="includes/lighting-fs.frag"></script>
-<script id="per-fragment-lighting-vs" type="x-shader/x-vertex" src="includes/lighting-vs.vert"></script>
-<script id="shader-fs" type="x-shader/x-fragment" src="includes/shader-fs.frag"></script>
-<script id="shader-vs" type="x-shader/x-vertex" src="includes/shader-vs.vert"></script>
-
 <script type="text/javascript" src="includes/Room.js"></script>
 
 <script type="text/javascript">
   var gl;
+
+  var WAGConfig = {
+    programs: {
+      perVertex: {
+        fragment: "includes/shader-fs.frag",
+        vertex:   "includes/shader-vs.vert"
+      },
+      perFragment: {
+        fragment: "includes/lighting-fs.frag",
+        vertex:   "includes/lighting-vs.vert"
+      },
+      spotlight: {
+        fragment: "includes/spotlight-fs.frag",
+        vertex:   "includes/spotlight-vs.vert"
+      }
+    }
+  }
 
   function initGL(canvas) {
     try {
@@ -33,20 +43,20 @@
   }
 
 
-  function getShader(gl, id, cb) {
-    var shaderScript = document.getElementById(id);
+  function getShader(gl, id, shader_type, cb) {
+    var shaderScript = WAGConfig.programs[id];
     if (!shaderScript) {
       return null;
     }
     
     $.ajax({
-      url: shaderScript.src,
+      url: shaderScript[shader_type],
       dataType: "text",
       success: function(data) {
         var shader;
-        if (shaderScript.type == "x-shader/x-fragment") {
+        if (shader_type == "fragment") {
           shader = gl.createShader(gl.FRAGMENT_SHADER);
-        } else if (shaderScript.type == "x-shader/x-vertex") {
+        } else if (shader_type == "vertex") {
           shader = gl.createShader(gl.VERTEX_SHADER);
         } else {
           cb(null);
@@ -68,9 +78,9 @@
     });
   }
   
-  function createProgram(fragmentShaderID, vertexShaderID, cb) {
-    getShader(gl, fragmentShaderID, function(fragmentShader) {
-      getShader(gl, vertexShaderID, function(vertexShader) {
+  function createProgram(program_id, cb) {
+    getShader(gl, program_id, "fragment", function(fragmentShader) {
+      getShader(gl, program_id, "vertex", function(vertexShader) {
         var program = gl.createProgram();
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -114,11 +124,11 @@
   var perFragmentProgram;
   var spotlightProgram;
   function initShaders(cb) {
-    createProgram("per-fragment-lighting-fs", "per-fragment-lighting-vs", function(prog) {
+    createProgram("perFragment", function(prog) {
       perFragmentProgram = prog;
-      createProgram("per-fragment-spotlight-fs", "per-fragment-spotlight-vs", function(prog) {
+      createProgram("spotlight", function(prog) {
         spotlightProgram = prog;
-        createProgram("shader-fs", "shader-vs", function(prog) {
+        createProgram("perVertex", function(prog) {
           perVertexProgram = prog;
           cb();
         });
