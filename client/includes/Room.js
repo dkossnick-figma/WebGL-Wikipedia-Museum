@@ -6,25 +6,33 @@ function Room(loadCompleteCallback) {
   this.onLoadComplete = loadCompleteCallback;
 
   this.walls = {
+  	type: "room",
     world: "world.txt",
     textureMap: "01.jpg"
   };
   this.floor = {
+  	type: "room",
     world: "floor.txt",
     textureMap: "stone.jpg"
   };
   this.ceiling = {
+  	type: "room",
     world: "ceiling.txt",
     textureMap: "stone.jpg"
   };
-  this.painting = {
-    world: "painting.txt",
-    textureMap: "Stravinsky_picasso.png",
-    width: 430,
-    height: 640
-  };
+  
+  this.paintingImages = [
+  	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
+  	{ img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
+		{ img: "greatwall.jpg", width: 1843, height: 746 }
+  ];  
+  this.paintingCoords = [
+  	[ 0.0, 0.55, -3.0 ],
+  	[ -1.5, 0.55, -3.0 ],
+  	[ -0.75, 0.55, -3.0],
+  ]; 
 
-  this.components = ["walls", "floor", "ceiling", "painting"];
+  this.components = ["walls", "floor", "ceiling"/*, "painting"*/];
   this.loadedComponents = 0;
 
   this._initTexture = function(component_name) {
@@ -41,7 +49,12 @@ function Room(loadCompleteCallback) {
   }
 
   this._loadWorld = function(component_name) {
-    var component = this[component_name];
+		var component = this[component_name];
+    if (component.type == "painting") {
+    	this._handleLoadedWorld(component, null);
+    	return;
+    }    
+    
     $.ajax({
       url: component.world,
       dataType: "text",
@@ -51,11 +64,11 @@ function Room(loadCompleteCallback) {
     });
   }
   
-  this._generatePainting = function(component, origin/*, direction*/) {		
+  this._generatePainting = function(component/*, origin, direction*/) {		
 		
 		var maxWidth = 0.5, maxHeight = 0.5;
 		
-		var l = 0.05;    // thickness of painting
+		var l = 0.04;    // thickness of painting
 		var w = maxWidth;
 		var h = component.height * (maxWidth / component.width);
 		
@@ -64,7 +77,7 @@ function Room(loadCompleteCallback) {
 			w = component.width * (maxHeight / component.height);
 		}
 		
-		var x = origin[0], y = origin[1], z = origin[2];
+		var x = component.origin[0], y = component.origin[1], z = component.origin[2];
 
 		var v = [], r = [];
 		// origin is in middle of 4-5-6-7		
@@ -154,11 +167,10 @@ function Room(loadCompleteCallback) {
 
   	var lines;
   	
-  	if (component.world != "painting.txt") {
+  	if (data != null) {
     	lines = data.split("\n");  		  	
   	} else {
-  		var origin = [ 0.0, 0.55, -3.0 ];
-  		lines = this._generatePainting(component, origin); 
+  		lines = this._generatePainting(component); 
   	}  
 
     var vertexCount = 0;
@@ -191,7 +203,7 @@ function Room(loadCompleteCallback) {
 
     for (var i in lines) {
       var vals;
-      if (component.world != "painting.txt") {
+      if (data != null) {
       	vals = lines[i].replace(/^\s+/, "").split(/\s+/);
       } else {
       	vals = lines[i];
@@ -277,6 +289,20 @@ function Room(loadCompleteCallback) {
   }
 
   this.initialize = function() {
+  	// For each painting, add to component
+  	for (var i in this.paintingImages) {
+  		var painting = {
+  			type: "painting",
+  			textureMap: this.paintingImages[i].img,
+  			width: this.paintingImages[i].width,
+  			height: this.paintingImages[i].height,
+  			origin: this.paintingCoords[i]
+  		};
+  		var objName = "painting" + i;
+  		this[objName] = painting;  		
+  		this.components.push(objName);  	
+  	}
+  
     // For each component, load the world and the texture
     for (var i in this.components) {
       var component_name = this.components[i];
