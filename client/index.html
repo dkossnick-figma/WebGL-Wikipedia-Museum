@@ -221,12 +221,6 @@
     room.renderComponents();
   }
 
-  function tick() {
-    handleKeys();
-    drawScene();
-    animate();
-  }
-
   $(document).ready(function() {
     room = new Room(function() {
       $('#loadingtext').hide();

@@ -30,7 +30,11 @@ function WAG(canvas) {
       document.onkeydown = handleKeyDown;
       document.onkeyup = handleKeyUp;
 
-      setInterval(tick, 15);
+      setInterval(function() {
+        handleKeys();
+        drawScene();
+        animate();
+      }, 33);
     }.bind(this));
   }
 
