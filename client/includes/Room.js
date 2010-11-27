@@ -7,7 +7,7 @@ function Room(loadCompleteCallback) {
 
   this.walls = {
     world: "world.txt",
-    textureMap: "mud.gif"
+    textureMap: "01.jpg"
   };
   this.floor = {
     world: "floor.txt",
@@ -17,8 +17,12 @@ function Room(loadCompleteCallback) {
     world: "ceiling.txt",
     textureMap: "stone.jpg"
   };
+  this.painting = {
+    world: "painting.txt",
+    textureMap: "mona-lisa-painting.jpg"
+  };
 
-  this.components = ["walls", "floor", "ceiling"];
+  this.components = ["walls", "floor", "ceiling", "painting"];
   this.loadedComponents = 0;
 
   this._initTexture = function(component_name) {

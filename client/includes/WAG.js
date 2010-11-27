@@ -13,9 +13,6 @@ function WAG(canvas) {
     }
 
     this.initShaders(function() {
-      // init the cube variables here
-    	initBuffers();
-
       // Initializes the architecture and textures of the room
       room.initialize();
 
