@@ -19,7 +19,9 @@ function Room(loadCompleteCallback) {
   };
   this.painting = {
     world: "painting.txt",
-    textureMap: "mona-lisa-painting.jpg"
+    textureMap: "Stravinsky_picasso.png",
+    width: 430,
+    height: 640
   };
 
   this.components = ["walls", "floor", "ceiling", "painting"];
@@ -48,9 +50,117 @@ function Room(loadCompleteCallback) {
       }.bind(this)
     });
   }
+  
+  this._generatePainting = function(component, origin/*, direction*/) {		
+		
+		var maxWidth = 0.5, maxHeight = 0.5;
+		
+		var l = 0.05;    // thickness of painting
+		var w = maxWidth;
+		var h = component.height * (maxWidth / component.width);
+		
+		if (h > maxHeight) {
+			h = maxHeight;
+			w = component.width * (maxHeight / component.height);
+		}
+		
+		var x = origin[0], y = origin[1], z = origin[2];
+
+		var v = [], r = [];
+		// origin is in middle of 4-5-6-7		
+		// below is actually only for far wall
+		
+		v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
+		v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
+		v[2] = [ x + (w / 2.0), y - (h / 2.0), z + l ];
+		v[3] = [ x - (w / 2.0), y - (h / 2.0), z + l ];
+		v[4] = [ x - (w / 2.0), y - (h / 2.0), z ];
+		v[5] = [ x + (w / 2.0), y - (h / 2.0), z ];
+		v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
+		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];		
+		
+		r[0] = [ 0.0, 1.0 ];
+		r[1] = [ 0.0, 0.0 ];
+		r[2] = [ 1.0, 0.0 ];
+		r[3] = [ 1.0, 1.0 ];
+		
+		
+		// calculate triangles now!
+		/*********
+		
+			7 ------ 6
+		 / |      / |
+		0 -|---- 1  |
+		|  |     |  |
+		|  4 ----|- 5
+		| /      | /
+		3 ------ 2
+		
+		*************/		
+		var vertices = [];
+		var textures = [];
+		
+		// front face
+		vertices.push(v[0]);  textures.push(r[0]);
+		vertices.push(v[3]);  textures.push(r[1]);
+		vertices.push(v[2]);  textures.push(r[2]);
+		vertices.push(v[0]);  textures.push(r[0]);
+		vertices.push(v[1]);  textures.push(r[3]);
+		vertices.push(v[2]);  textures.push(r[2]);
+
+		// right face
+		vertices.push(v[1]);  textures.push(r[1]);
+		vertices.push(v[2]);  textures.push(r[1]);
+		vertices.push(v[5]);  textures.push(r[1]);
+		vertices.push(v[1]);  textures.push(r[1]);
+		vertices.push(v[6]);  textures.push(r[1]);
+		vertices.push(v[5]);  textures.push(r[1]);		
+		
+		// left face
+		vertices.push(v[0]);  textures.push(r[1]);
+		vertices.push(v[3]);  textures.push(r[1]);
+		vertices.push(v[4]);  textures.push(r[1]);
+		vertices.push(v[0]);  textures.push(r[1]);
+		vertices.push(v[7]);  textures.push(r[1]);
+		vertices.push(v[4]);  textures.push(r[1]);
+		
+		// top face
+		vertices.push(v[0]);  textures.push(r[1]);
+		vertices.push(v[1]);  textures.push(r[1]);
+		vertices.push(v[6]);  textures.push(r[1]);
+		vertices.push(v[0]);  textures.push(r[1]);
+		vertices.push(v[7]);  textures.push(r[1]);
+		vertices.push(v[6]);  textures.push(r[1]);
+		
+		// bottom face
+		vertices.push(v[4]);  textures.push(r[1]);
+		vertices.push(v[3]);  textures.push(r[1]);
+		vertices.push(v[2]);  textures.push(r[1]);
+		vertices.push(v[4]);  textures.push(r[1]);
+		vertices.push(v[5]);  textures.push(r[1]);
+		vertices.push(v[2]);  textures.push(r[1]);		
+		
+		var lines = [];
+
+		for (var i = 0; i < vertices.length; i++) {
+			lines.push(vertices[i].concat(textures[i]));		
+		}
+
+		return lines;
+  }
+  
 
   this._handleLoadedWorld = function(component, data) {
-    var lines = data.split("\n");
+
+  	var lines;
+  	
+  	if (component.world != "painting.txt") {
+    	lines = data.split("\n");  		  	
+  	} else {
+  		var origin = [ 0.0, 0.55, -3.0 ];
+  		lines = this._generatePainting(component, origin); 
+  	}  
+
     var vertexCount = 0;
     var vertexPositions = [];
     var vertexTextureCoords = [];
@@ -80,7 +190,13 @@ function Room(loadCompleteCallback) {
 
 
     for (var i in lines) {
-      var vals = lines[i].replace(/^\s+/, "").split(/\s+/);
+      var vals;
+      if (component.world != "painting.txt") {
+      	vals = lines[i].replace(/^\s+/, "").split(/\s+/);
+      } else {
+      	vals = lines[i];
+      }
+      
       if (vals.length == 5 && vals[0] != "//") {
         // It is a line describing a vertex.  Construct an object to
         // represent it:
@@ -97,8 +213,6 @@ function Room(loadCompleteCallback) {
 
           // Add front and back-facing triangles
           addTriangleToLists(currentTriangle, normal, false);
-          // TODO(kozzles): better solution to painting "reflection" error than
-          // doing backfacing triangles twice??
           addTriangleToLists(currentTriangle, normal, true);
 
           currentTriangle = [];
