@@ -31,7 +31,7 @@ function Room(loadCompleteCallback) {
   	{ origin: [ -3.0, 0.55, 0 ], dir: "e" },
   	{ origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
   	{ origin: [ -0.75, 0.55, 3.0], dir: "s" }
-  ]; 
+  ];
 
   // TODO: Why does the wall have to be last for it to render?
   this.components = ["ceiling", "floor", "walls"];
@@ -66,8 +66,8 @@ function Room(loadCompleteCallback) {
       }.bind(this)
     });
   }
-  
-  this._generatePainting = function(component/*, origin, direction*/) {		
+
+  this._generatePainting = function(component/*, origin, direction*/) {
 		var maxWidth = 0.9, maxHeight = 0.5;
 		var l = 0.04;    // thickness of painting
 		var w = maxWidth;
@@ -77,35 +77,35 @@ function Room(loadCompleteCallback) {
 			h = maxHeight;
 			w = component.width * (maxHeight / component.height);
 		}
-		
+
 		if (component.direction == "s") {
 			l = -l;
 		}
-		
+
 		var x = component.origin[0], y = component.origin[1], z = component.origin[2];
 
 		var v = [], r = [];
 
-		/*********		
+		/*********
 			7 ------ 6
 		 / |      / |
 		0 -|---- 1  | (origin in middle of 4-5-6-7)
 		|  |     |  | ASCII art by yby
 		|  4 ----|- 5
 		| /      | /
-		3 ------ 2		
+		3 ------ 2
 		*************/
-		
-		
+
+
 		// N: x by y, depth z
 		// E: z by y, depth x
-		
+
 		// below is for east wall, middle is 1-6-5-2
-		
+
 		if (component.direction == "e" || component.direction == "w") {
 			var temp = x;
 			x = z;
-			z = temp;			
+			z = temp;
 		}
 
 		// below is actually only for north + south wall
@@ -116,8 +116,8 @@ function Room(loadCompleteCallback) {
 		v[4] = [ x - (w / 2.0), y - (h / 2.0), z ];
 		v[5] = [ x + (w / 2.0), y - (h / 2.0), z ];
 		v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
-		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];		
-		
+		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];
+
 		/*r[0] = [ 0.0, 1.0 ];
 		r[1] = [ 0.0, 0.0 ];
 		r[2] = [ 1.0, 0.0 ];
@@ -127,16 +127,16 @@ function Room(loadCompleteCallback) {
 		r[1] = [ 0.0, 0.0 ];
 		r[2] = [ 1.0, 0.0 ];
 		r[3] = [ 1.0, 1.0 ];
-		
+
 		if (component.direction == "e" || component.direction == "w") {
 			for (var i in v) {
 				var temp = v[i][0];
 				v[i][0] = v[i][2];
-				v[i][2] = temp;			
-			}		
+				v[i][2] = temp;
+			}
 		}
 
-		
+
 		// calculate triangles now!
 		var vertices = [];
 		var textures = [];
