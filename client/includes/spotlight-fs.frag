@@ -29,7 +29,7 @@ void main(void) {
   } else {
     vec3 lightDirection = normalize(uPointLightingLocation - vPosition.xyz);
     float directionalLightWeighting = max(dot(normalize(vTransformedNormal.xyz), lightDirection), 0.0);
-    float diff = acos(dot(lightDirection, uPointLightingDirection));
+    float diff = acos(dot(lightDirection, normalize(uPointLightingDirection)));
     if (diff < uInnerAngle)
         lightWeighting += uPointLightingColor * directionalLightWeighting;
     else if (diff <= uOuterAngle) {
