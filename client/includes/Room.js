@@ -25,11 +25,13 @@ function Room(loadCompleteCallback) {
     { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
     { img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
     { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
+    { img: "mona-lisa-painting.jpg", width: 380, height: 600 }
   ];
   this.paintingCoords = [
-    { origin: [ -3.0, 0.55, 0 ], dir: "e" },
+    { origin: [ -2.0, 0.55, 1.5 ], dir: "w" },
     { origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
-    { origin: [ -0.75, 0.55, 3.0], dir: "s" }
+    { origin: [ -0.75, 0.55, 3.0 ], dir: "s" },
+    { origin: [ 2.0, 0.55, 1.5 ], dir: "e" }
   ];
 
   // TODO: Why does the wall have to be last for it to render?
@@ -77,7 +79,8 @@ function Room(loadCompleteCallback) {
       w = component.width * (maxHeight / component.height);
     }
 
-    if (component.direction == "s") {
+    // painting goes "inward", not outward for south/east wall
+    if (component.direction == "s" || component.direction == "e") {
       l = -l;
     }
 
@@ -101,6 +104,7 @@ function Room(loadCompleteCallback) {
 
     // below is for east wall, middle is 1-6-5-2
 
+    // x-z coords switched for side walls
     if (component.direction == "e" || component.direction == "w") {
       var temp = x;
       x = z;
@@ -120,13 +124,23 @@ function Room(loadCompleteCallback) {
     /*r[0] = [ 0.0, 1.0 ];
     r[1] = [ 0.0, 0.0 ];
     r[2] = [ 1.0, 0.0 ];
-    r[3] = [ 1.0, 1.0 ];*/
+    r[3] = [ 1.0, 1.0 ];
+    
+    0-1-2-3
+    3-2-1-0
+    
+    */
 
     r[0] = [ 0.0, 1.0 ];
     r[1] = [ 0.0, 0.0 ];
     r[2] = [ 1.0, 0.0 ];
     r[3] = [ 1.0, 1.0 ];
+    
+    if (component.direction == "s" || component.direction == "w") {
+      r.reverse();
+    }
 
+    // switch x/z coords for side walls
     if (component.direction == "e" || component.direction == "w") {
       for (var i in v) {
         var temp = v[i][0];
