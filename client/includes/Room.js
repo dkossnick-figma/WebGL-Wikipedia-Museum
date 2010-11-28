@@ -13,26 +13,25 @@ function Room(loadCompleteCallback) {
   this.floor = {
   	type: "room",
     world: "floor.txt",
-    textureMap: "stone.jpg"
+    textureMap: "textures/plank.jpg"
   };
   this.ceiling = {
   	type: "room",
     world: "ceiling.txt",
     textureMap: "stone.jpg"
   };
-  
+
   this.paintingImages = [
   	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
   	{ img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
-		{ img: "greatwall.jpg", width: 1843, height: 746 }
-  ];  
+  ];
   this.paintingCoords = [
   	[ 0.0, 0.55, -3.0 ],
   	[ -1.5, 0.55, -3.0 ],
   	[ -0.75, 0.55, -3.0],
-  ]; 
+  ];
 
-  this.components = ["walls", "floor", "ceiling"/*, "painting"*/];
+  this.components = ["walls", "floor", "ceiling"];
   this.loadedComponents = 0;
 
   this._initTexture = function(component_name) {
@@ -53,8 +52,8 @@ function Room(loadCompleteCallback) {
     if (component.type == "painting") {
     	this._handleLoadedWorld(component, null);
     	return;
-    }    
-    
+    }
+
     $.ajax({
       url: component.world,
       dataType: "text",
@@ -63,26 +62,25 @@ function Room(loadCompleteCallback) {
       }.bind(this)
     });
   }
-  
-  this._generatePainting = function(component/*, origin, direction*/) {		
-		
+
+  this._generatePainting = function(component) {
 		var maxWidth = 0.5, maxHeight = 0.5;
-		
+
 		var l = 0.04;    // thickness of painting
 		var w = maxWidth;
 		var h = component.height * (maxWidth / component.width);
-		
+
 		if (h > maxHeight) {
 			h = maxHeight;
 			w = component.width * (maxHeight / component.height);
 		}
-		
+
 		var x = component.origin[0], y = component.origin[1], z = component.origin[2];
 
 		var v = [], r = [];
-		// origin is in middle of 4-5-6-7		
+		// origin is in middle of 4-5-6-7
 		// below is actually only for far wall
-		
+
 		v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
 		v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
 		v[2] = [ x + (w / 2.0), y - (h / 2.0), z + l ];
@@ -90,17 +88,17 @@ function Room(loadCompleteCallback) {
 		v[4] = [ x - (w / 2.0), y - (h / 2.0), z ];
 		v[5] = [ x + (w / 2.0), y - (h / 2.0), z ];
 		v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
-		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];		
-		
+		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];
+
 		r[0] = [ 0.0, 1.0 ];
 		r[1] = [ 0.0, 0.0 ];
 		r[2] = [ 1.0, 0.0 ];
 		r[3] = [ 1.0, 1.0 ];
-		
-		
+
+
 		// calculate triangles now!
 		/*********
-		
+
 			7 ------ 6
 		 / |      / |
 		0 -|---- 1  |
@@ -108,11 +106,11 @@ function Room(loadCompleteCallback) {
 		|  4 ----|- 5
 		| /      | /
 		3 ------ 2
-		
-		*************/		
+
+		*************/
 		var vertices = [];
 		var textures = [];
-		
+
 		// front face
 		vertices.push(v[0]);  textures.push(r[0]);
 		vertices.push(v[3]);  textures.push(r[1]);
@@ -127,8 +125,8 @@ function Room(loadCompleteCallback) {
 		vertices.push(v[5]);  textures.push(r[1]);
 		vertices.push(v[1]);  textures.push(r[1]);
 		vertices.push(v[6]);  textures.push(r[1]);
-		vertices.push(v[5]);  textures.push(r[1]);		
-		
+		vertices.push(v[5]);  textures.push(r[1]);
+
 		// left face
 		vertices.push(v[0]);  textures.push(r[1]);
 		vertices.push(v[3]);  textures.push(r[1]);
@@ -136,7 +134,7 @@ function Room(loadCompleteCallback) {
 		vertices.push(v[0]);  textures.push(r[1]);
 		vertices.push(v[7]);  textures.push(r[1]);
 		vertices.push(v[4]);  textures.push(r[1]);
-		
+
 		// top face
 		vertices.push(v[0]);  textures.push(r[1]);
 		vertices.push(v[1]);  textures.push(r[1]);
@@ -144,34 +142,33 @@ function Room(loadCompleteCallback) {
 		vertices.push(v[0]);  textures.push(r[1]);
 		vertices.push(v[7]);  textures.push(r[1]);
 		vertices.push(v[6]);  textures.push(r[1]);
-		
+
 		// bottom face
 		vertices.push(v[4]);  textures.push(r[1]);
 		vertices.push(v[3]);  textures.push(r[1]);
 		vertices.push(v[2]);  textures.push(r[1]);
 		vertices.push(v[4]);  textures.push(r[1]);
 		vertices.push(v[5]);  textures.push(r[1]);
-		vertices.push(v[2]);  textures.push(r[1]);		
-		
+		vertices.push(v[2]);  textures.push(r[1]);
+
 		var lines = [];
 
 		for (var i = 0; i < vertices.length; i++) {
-			lines.push(vertices[i].concat(textures[i]));		
+			lines.push(vertices[i].concat(textures[i]));
 		}
 
 		return lines;
   }
-  
+
 
   this._handleLoadedWorld = function(component, data) {
-
   	var lines;
-  	
+
   	if (data != null) {
-    	lines = data.split("\n");  		  	
+    	lines = data.split("\n");
   	} else {
-  		lines = this._generatePainting(component); 
-  	}  
+  		lines = this._generatePainting(component);
+  	}
 
     var vertexCount = 0;
     var vertexPositions = [];
@@ -208,7 +205,7 @@ function Room(loadCompleteCallback) {
       } else {
       	vals = lines[i];
       }
-      
+
       if (vals.length == 5 && vals[0] != "//") {
         // It is a line describing a vertex.  Construct an object to
         // represent it:
@@ -299,10 +296,10 @@ function Room(loadCompleteCallback) {
   			origin: this.paintingCoords[i]
   		};
   		var objName = "painting" + i;
-  		this[objName] = painting;  		
-  		this.components.push(objName);  	
+  		this[objName] = painting;
+  		this.components.push(objName);
   	}
-  
+
     // For each component, load the world and the texture
     for (var i in this.components) {
       var component_name = this.components[i];
