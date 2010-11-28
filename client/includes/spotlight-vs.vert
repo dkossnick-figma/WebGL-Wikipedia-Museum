@@ -1,3 +1,5 @@
+// Per-fragment
+
 attribute vec3 aVertexPosition;
 attribute vec3 aVertexNormal;
 attribute vec2 aTextureCoord;
@@ -10,10 +12,9 @@ varying vec2 vTextureCoord;
 varying vec4 vTransformedNormal;
 varying vec4 vPosition;
 
-
 void main(void) {
-  vPosition = uMVMatrix * vec4(aVertexPosition, 1.0);
-  gl_Position = uPMatrix * vPosition;
+  vPosition = vec4(aVertexPosition, 1.0);
+  gl_Position = uPMatrix * uMVMatrix * vPosition;
   vTextureCoord = aTextureCoord;
-  vTransformedNormal = uNMatrix * vec4(aVertexNormal, 1.0);
+  vTransformedNormal = vec4(aVertexNormal, 1.0);
 }

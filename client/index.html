@@ -104,9 +104,8 @@
         program.useTexturesUniform = gl.getUniformLocation(program, "uUseTextures");
         program.useLightingUniform = gl.getUniformLocation(program, "uUseLighting");
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
-        program.spotCosCutoffUniform = gl.getUniformLocation(program, "uSpotCosCutoff");
-        program.cosInnerConeAngleUniform = gl.getUniformLocation(program, "uCosInnerConeAngle");
-        program.cosOuterConeAngleUniform = gl.getUniformLocation(program, "uCosOuterConeAngle");
+        program.innerAngleUniform = gl.getUniformLocation(program, "uInnerAngle");
+        program.outerAngleUniform = gl.getUniformLocation(program, "uOuterAngle");
         program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
         program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
         program.pointLightingDirectionUniform = gl.getUniformLocation(program, "uPointLightingDirection");
@@ -182,18 +181,13 @@
       );
       
       gl.uniform1f(
-        currentProgram.spotCosCutoffUniform,
-        parseFloat(document.getElementById("spotCosCutoff").value)
+        currentProgram.innerAngleUniform,
+        parseFloat(document.getElementById("inner_angle").value)
       );
       
       gl.uniform1f(
-        currentProgram.cosInnerConeAngleUniform,
-        parseFloat(document.getElementById("cos_inner_cone_angle").value)
-      );
-      
-      gl.uniform1f(
-        currentProgram.cosOuterConeAngleUniform,
-        parseFloat(document.getElementById("cos_outer_cone_angle").value)
+        currentProgram.outerAngleUniform,
+        parseFloat(document.getElementById("outer_angle").value)
       );
     }
 
@@ -241,9 +235,9 @@ Shader program:
 <table id="parameterTable">
 <tr>
 <th>Position:</th>
-<td>X: <input type="text" id="lightPositionX" value="-0.25" /></td>
+<td>X: <input type="text" id="lightPositionX" value="-1.5" /></td>
 <td>Y: <input type="text" id="lightPositionY" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ" value="-1.0" /></td>
+<td>Z: <input type="text" id="lightPositionZ" value="-2.5" /></td>
 </tr>
 <tr>
 <th>Colour:</th>
@@ -259,15 +253,14 @@ Shader program:
 </tr>
 <tr>
 <th>Spotlight Direction:</th>
-<td>X: <input type="text" id="directionX" value="0.2" /></td>
-<td>Y: <input type="text" id="directionY" value="0.2" /></td>
-<td>Z: <input type="text" id="directionZ" value="0.2" /></td>
+<td>X: <input type="text" id="directionX" value="0" /></td>
+<td>Y: <input type="text" id="directionY" value="0" /></td>
+<td>Z: <input type="text" id="directionZ" value="1" /></td>
 </tr>
 <tr>
 <th>Spotlight Params:</th>
-<td>spotCosCutoff: <input type="text" id="spotCosCutoff" value="0.2" /></td>
-<td>Cos Inner Cone Angle: <input type="text" id="cos_inner_cone_angle" value="0.2" /></td>
-<td>Cos Outer Cone Angle: <input type="text" id="cos_outer_cone_angle" value="0.2" /></td>
+<td>Inner Angle: <input type="text" id="inner_angle" value="0.6" /></td>
+<td>Outer Angle: <input type="text" id="outer_angle" value="0.7" /></td>
 </tr>
 </table>
 
