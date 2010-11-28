@@ -6,31 +6,30 @@ function Room(loadCompleteCallback) {
   this.onLoadComplete = loadCompleteCallback;
 
   this.walls = {
-  	type: "room",
+    type: "room",
     world: "world.txt",
     textureMap: "01.jpg"
   };
   this.floor = {
-  	type: "room",
+    type: "room",
     world: "floor.txt",
     textureMap: "textures/plank.jpg"
   };
   this.ceiling = {
-  	type: "room",
+    type: "room",
     world: "ceiling.txt",
-    textureMap: "stone.jpg"
+    textureMap: "01.jpg"
   };
 
   this.paintingImages = [
-  	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
-  	{ img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
-  	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
+    { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
+    { img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
+    { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
   ];
   this.paintingCoords = [
-  	//{ origin: [ 0.0, 0.55, -3.0 ], dir: "n" },
-  	{ origin: [ -3.0, 0.55, 0 ], dir: "e" },
-  	{ origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
-  	{ origin: [ -0.75, 0.55, 3.0], dir: "s" }
+    { origin: [ -3.0, 0.55, 0 ], dir: "e" },
+    { origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
+    { origin: [ -0.75, 0.55, 3.0], dir: "s" }
   ];
 
   // TODO: Why does the wall have to be last for it to render?
@@ -52,10 +51,10 @@ function Room(loadCompleteCallback) {
   }
 
   this._loadWorld = function(component_name) {
-		var component = this[component_name];
+    var component = this[component_name];
     if (component.type == "painting") {
-    	this._handleLoadedWorld(component, null);
-    	return;
+      this._handleLoadedWorld(component, null);
+      return;
     }
 
     $.ajax({
@@ -68,126 +67,126 @@ function Room(loadCompleteCallback) {
   }
 
   this._generatePainting = function(component/*, origin, direction*/) {
-		var maxWidth = 0.9, maxHeight = 0.5;
-		var l = 0.04;    // thickness of painting
-		var w = maxWidth;
-		var h = component.height * (maxWidth / component.width);
+    var maxWidth = 0.9, maxHeight = 0.5;
+    var l = 0.04;    // thickness of painting
+    var w = maxWidth;
+    var h = component.height * (maxWidth / component.width);
 
-		if (h > maxHeight) {
-			h = maxHeight;
-			w = component.width * (maxHeight / component.height);
-		}
+    if (h > maxHeight) {
+      h = maxHeight;
+      w = component.width * (maxHeight / component.height);
+    }
 
-		if (component.direction == "s") {
-			l = -l;
-		}
+    if (component.direction == "s") {
+      l = -l;
+    }
 
-		var x = component.origin[0], y = component.origin[1], z = component.origin[2];
+    var x = component.origin[0], y = component.origin[1], z = component.origin[2];
 
-		var v = [], r = [];
+    var v = [], r = [];
 
-		/*********
-			7 ------ 6
-		 / |      / |
-		0 -|---- 1  | (origin in middle of 4-5-6-7)
-		|  |     |  | ASCII art by yby
-		|  4 ----|- 5
-		| /      | /
-		3 ------ 2
-		*************/
-
-
-		// N: x by y, depth z
-		// E: z by y, depth x
-
-		// below is for east wall, middle is 1-6-5-2
-
-		if (component.direction == "e" || component.direction == "w") {
-			var temp = x;
-			x = z;
-			z = temp;
-		}
-
-		// below is actually only for north + south wall
-		v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
-		v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
-		v[2] = [ x + (w / 2.0), y - (h / 2.0), z + l ];
-		v[3] = [ x - (w / 2.0), y - (h / 2.0), z + l ];
-		v[4] = [ x - (w / 2.0), y - (h / 2.0), z ];
-		v[5] = [ x + (w / 2.0), y - (h / 2.0), z ];
-		v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
-		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];
-
-		/*r[0] = [ 0.0, 1.0 ];
-		r[1] = [ 0.0, 0.0 ];
-		r[2] = [ 1.0, 0.0 ];
-		r[3] = [ 1.0, 1.0 ];*/
-
-		r[0] = [ 0.0, 1.0 ];
-		r[1] = [ 0.0, 0.0 ];
-		r[2] = [ 1.0, 0.0 ];
-		r[3] = [ 1.0, 1.0 ];
-
-		if (component.direction == "e" || component.direction == "w") {
-			for (var i in v) {
-				var temp = v[i][0];
-				v[i][0] = v[i][2];
-				v[i][2] = temp;
-			}
-		}
+    /*********
+      7 ------ 6
+     / |      / |
+    0 -|---- 1  | (origin in middle of 4-5-6-7)
+    |  |     |  | ASCII art by yby
+    |  4 ----|- 5
+    | /      | /
+    3 ------ 2
+    *************/
 
 
-		// calculate triangles now!
-		var vertices = [];
-		var textures = [];
+    // N: x by y, depth z
+    // E: z by y, depth x
 
-		// front face
-		vertices.push(v[0]);  textures.push(r[0]);
-		vertices.push(v[3]);  textures.push(r[1]);
-		vertices.push(v[2]);  textures.push(r[2]);
-		vertices.push(v[0]);  textures.push(r[0]);
-		vertices.push(v[1]);  textures.push(r[3]);
-		vertices.push(v[2]);  textures.push(r[2]);
+    // below is for east wall, middle is 1-6-5-2
 
-		// right face
-		vertices.push(v[1]);  textures.push(r[1]);
-		vertices.push(v[2]);  textures.push(r[1]);
-		vertices.push(v[5]);  textures.push(r[1]);
-		vertices.push(v[1]);  textures.push(r[1]);
-		vertices.push(v[6]);  textures.push(r[1]);
-		vertices.push(v[5]);  textures.push(r[1]);
+    if (component.direction == "e" || component.direction == "w") {
+      var temp = x;
+      x = z;
+      z = temp;
+    }
 
-		// left face
-		vertices.push(v[0]);  textures.push(r[1]);
-		vertices.push(v[3]);  textures.push(r[1]);
-		vertices.push(v[4]);  textures.push(r[1]);
-		vertices.push(v[0]);  textures.push(r[1]);
-		vertices.push(v[7]);  textures.push(r[1]);
-		vertices.push(v[4]);  textures.push(r[1]);
+    // below is actually only for north + south wall
+    v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
+    v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
+    v[2] = [ x + (w / 2.0), y - (h / 2.0), z + l ];
+    v[3] = [ x - (w / 2.0), y - (h / 2.0), z + l ];
+    v[4] = [ x - (w / 2.0), y - (h / 2.0), z ];
+    v[5] = [ x + (w / 2.0), y - (h / 2.0), z ];
+    v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
+    v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];
 
-		// top face
-		vertices.push(v[0]);  textures.push(r[1]);
-		vertices.push(v[1]);  textures.push(r[1]);
-		vertices.push(v[6]);  textures.push(r[1]);
-		vertices.push(v[0]);  textures.push(r[1]);
-		vertices.push(v[7]);  textures.push(r[1]);
-		vertices.push(v[6]);  textures.push(r[1]);
+    /*r[0] = [ 0.0, 1.0 ];
+    r[1] = [ 0.0, 0.0 ];
+    r[2] = [ 1.0, 0.0 ];
+    r[3] = [ 1.0, 1.0 ];*/
 
-		// bottom face
-		vertices.push(v[4]);  textures.push(r[1]);
-		vertices.push(v[3]);  textures.push(r[1]);
-		vertices.push(v[2]);  textures.push(r[1]);
-		vertices.push(v[4]);  textures.push(r[1]);
-		vertices.push(v[5]);  textures.push(r[1]);
-		vertices.push(v[2]);  textures.push(r[1]);
+    r[0] = [ 0.0, 1.0 ];
+    r[1] = [ 0.0, 0.0 ];
+    r[2] = [ 1.0, 0.0 ];
+    r[3] = [ 1.0, 1.0 ];
 
-		var lines = [];
+    if (component.direction == "e" || component.direction == "w") {
+      for (var i in v) {
+        var temp = v[i][0];
+        v[i][0] = v[i][2];
+        v[i][2] = temp;
+      }
+    }
 
-		for (var i = 0; i < vertices.length; i++) {
-			lines.push(vertices[i].concat(textures[i]));
-		}
 
-		return lines;
+    // calculate triangles now!
+    var vertices = [];
+    var textures = [];
+
+    // front face
+    vertices.push(v[0]);  textures.push(r[0]);
+    vertices.push(v[3]);  textures.push(r[1]);
+    vertices.push(v[2]);  textures.push(r[2]);
+    vertices.push(v[0]);  textures.push(r[0]);
+    vertices.push(v[1]);  textures.push(r[3]);
+    vertices.push(v[2]);  textures.push(r[2]);
+
+    // right face
+    vertices.push(v[1]);  textures.push(r[1]);
+    vertices.push(v[2]);  textures.push(r[1]);
+    vertices.push(v[5]);  textures.push(r[1]);
+    vertices.push(v[1]);  textures.push(r[1]);
+    vertices.push(v[6]);  textures.push(r[1]);
+    vertices.push(v[5]);  textures.push(r[1]);
+
+    // left face
+    vertices.push(v[0]);  textures.push(r[1]);
+    vertices.push(v[3]);  textures.push(r[1]);
+    vertices.push(v[4]);  textures.push(r[1]);
+    vertices.push(v[0]);  textures.push(r[1]);
+    vertices.push(v[7]);  textures.push(r[1]);
+    vertices.push(v[4]);  textures.push(r[1]);
+
+    // top face
+    vertices.push(v[0]);  textures.push(r[1]);
+    vertices.push(v[1]);  textures.push(r[1]);
+    vertices.push(v[6]);  textures.push(r[1]);
+    vertices.push(v[0]);  textures.push(r[1]);
+    vertices.push(v[7]);  textures.push(r[1]);
+    vertices.push(v[6]);  textures.push(r[1]);
+
+    // bottom face
+    vertices.push(v[4]);  textures.push(r[1]);
+    vertices.push(v[3]);  textures.push(r[1]);
+    vertices.push(v[2]);  textures.push(r[1]);
+    vertices.push(v[4]);  textures.push(r[1]);
+    vertices.push(v[5]);  textures.push(r[1]);
+    vertices.push(v[2]);  textures.push(r[1]);
+
+    var lines = [];
+
+    for (var i = 0; i < vertices.length; i++) {
+      lines.push(vertices[i].concat(textures[i]));
+    }
+
+    return lines;
   }
 
   this._handleLoadedTexture = function(texture) {
@@ -204,13 +203,13 @@ function Room(loadCompleteCallback) {
   }
 
   this._handleLoadedWorld = function(component, data) {
-  	var lines;
+    var lines;
 
-  	if (data != null) {
-    	lines = data.split("\n");
-  	} else {
-  		lines = this._generatePainting(component);
-  	}
+    if (data != null) {
+      lines = data.split("\n");
+    } else {
+      lines = this._generatePainting(component);
+    }
 
     var vertexCount = 0;
     var vertexPositions = [];
@@ -243,9 +242,9 @@ function Room(loadCompleteCallback) {
     for (var i in lines) {
       var vals;
       if (data != null) {
-      	vals = lines[i].replace(/^\s+/, "").split(/\s+/);
+        vals = lines[i].replace(/^\s+/, "").split(/\s+/);
       } else {
-      	vals = lines[i];
+        vals = lines[i];
       }
 
       if (vals.length == 5 && vals[0] != "//") {
@@ -338,20 +337,20 @@ function Room(loadCompleteCallback) {
   }
 
   this.initialize = function() {
-  	// For each painting, add to component
-  	for (var i in this.paintingImages) {
-  		var painting = {
-  			type: "painting",
-  			textureMap: this.paintingImages[i].img,
-  			width: this.paintingImages[i].width,
-  			height: this.paintingImages[i].height,
-  			origin: this.paintingCoords[i].origin,
-  			direction: this.paintingCoords[i].dir
-  		};
-  		var objName = "painting" + i;
-  		this[objName] = painting;
-  		this.components.push(objName);
-  	}
+    // For each painting, add to component
+    for (var i in this.paintingImages) {
+      var painting = {
+        type: "painting",
+        textureMap: this.paintingImages[i].img,
+        width: this.paintingImages[i].width,
+        height: this.paintingImages[i].height,
+        origin: this.paintingCoords[i].origin,
+        direction: this.paintingCoords[i].dir
+      };
+      var objName = "painting" + i;
+      this[objName] = painting;
+      this.components.push(objName);
+    }
 
     // For each component, load the world and the texture
     for (var i in this.components) {
