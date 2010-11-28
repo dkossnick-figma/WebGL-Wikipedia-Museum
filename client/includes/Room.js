@@ -8,7 +8,7 @@ function Room(loadCompleteCallback) {
   this.walls = {
     type: "room",
     world: "world.txt",
-    textureMap: "wallpaper.jpeg"
+    textureMap: "textures/wallpaper.jpg"
   };
   this.floor = {
     type: "room",
@@ -18,7 +18,7 @@ function Room(loadCompleteCallback) {
   this.ceiling = {
     type: "room",
     world: "ceiling.txt",
-    textureMap: "wallpaper.jpeg"
+    textureMap: "textures/wallpaper.jpg"
   };
 
   this.paintingImages = [
