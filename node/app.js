@@ -6,7 +6,8 @@
 var http = require("http"),
     sys = require("sys"),
     express = require("express"),
-    wikipedia = require("./wikipedia");
+    wikipedia = require("./wikipedia"),
+    WAGConsts = require("./WAGConsts");
 
 var puts = sys.puts,
     inspect = sys.inspect;
@@ -22,7 +23,9 @@ app.use(express.session());
 var wp = wikipedia.createInstance("en.wikipedia.org");
 
 app.get("/", function(req, res) {
-  res.send("Welcome to the Wikipedia Art Browser backend service.");
+  res.send({
+    resultCode: WAGConsts.UNKNOWN_METHOD
+  });
 });
 
 /**
@@ -31,6 +34,13 @@ app.get("/", function(req, res) {
  */
 app.get("/category/:cat", function(req, res) {
   wp.getCategoryImages(req.params.cat, function(data) {
+    if (data.length == 0) {
+      res.send({
+        resultCode: WAGConsts.EMPTY_CATEGORY
+      });
+      return;
+    }
+
     var images = [];
     for (var i in data) {
       images.push(data[i].image_title);
@@ -38,11 +48,32 @@ app.get("/category/:cat", function(req, res) {
 
     // Now get thumbs for each of the images
     wp.getImageThumbs(images, 400, function(thumbdata) {
-      res.send("Hello world!");
-      console.log(data);
-      console.log(thumbdata);
+      for (var i in data) {
+        var image_title = data[i].image_title;
+        if (thumbdata[image_title]) {
+          data[i].thumb_url = thumbdata[image_title];
+        } else {
+          console.error("CONSISTENCY: Did not retrieve thumb for "+image_title);
+          res.send({
+            resultCode: WAGConsts.UNKNOWN
+          });
+          return;
+        }
+      }
+      res.send({
+        resultCode: WAGConsts.SUCCESS,
+        data: data
+      });
     });
   });
+});
+
+/**
+ * Given an active session, returns more images for the given category.
+ * If none, returns null.
+ */
+app.get("/more", function(req, res) {
+  console.log("More called");
 });
 
 app.listen(8900);
