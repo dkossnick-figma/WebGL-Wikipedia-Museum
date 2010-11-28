@@ -6,8 +6,11 @@ function Room(loadCompleteCallback) {
   this.onLoadComplete = loadCompleteCallback;
 
   this.walls = {
-    type: "room",
-    world: "world.txt",
+    type: "generator",
+    generate: function() {
+      var gen = new WorldGenerator();
+      return gen.generateWorld();
+    },
     textureMap: "textures/wallpaper.jpg"
   };
   this.floor = {
@@ -29,8 +32,8 @@ function Room(loadCompleteCallback) {
   ];
   this.paintingCoords = [
     { origin: [ -2.0, 0.55, 1.5 ], dir: "w" },
-    { origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
-    { origin: [ -0.75, 0.55, 3.0 ], dir: "s" },
+    { origin: [ -1.5, 0.55, -2.0 ], dir: "n" },
+    { origin: [ -0.75, 0.55, 2.0 ], dir: "s" },
     { origin: [ 2.0, 0.55, 1.5 ], dir: "e" }
   ];
 
@@ -55,7 +58,10 @@ function Room(loadCompleteCallback) {
   this._loadWorld = function(component_name) {
     var component = this[component_name];
     if (component.type == "painting") {
-      this._handleLoadedWorld(component, null);
+      this._handleLoadedWorld(component, this._generatePainting(component));
+      return;
+    } else if (component.type == "generator") {
+      this._handleLoadedWorld(component, component.generate());
       return;
     }
 
@@ -219,10 +225,10 @@ function Room(loadCompleteCallback) {
   this._handleLoadedWorld = function(component, data) {
     var lines;
 
-    if (data != null) {
+    if (typeof data == "string") {
       lines = data.split("\n");
     } else {
-      lines = this._generatePainting(component);
+      lines = data;
     }
 
     var vertexCount = 0;
@@ -255,7 +261,7 @@ function Room(loadCompleteCallback) {
 
     for (var i in lines) {
       var vals;
-      if (data != null) {
+      if (typeof data == "string") {
         vals = lines[i].replace(/^\s+/, "").split(/\s+/);
       } else {
         vals = lines[i];
