@@ -24,15 +24,18 @@ function Room(loadCompleteCallback) {
   this.paintingImages = [
   	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
   	{ img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
+  	{ img: "mona-lisa-painting.jpg", width: 380, height: 600 },
   ];
   this.paintingCoords = [
-  	[ 0.0, 0.55, -3.0 ],
+  	[ 1.0, 0.55, -3.0 ],
   	[ -1.5, 0.55, -3.0 ],
-  	[ -0.75, 0.55, -3.0],
+  	[ 1.5, 0.55, -3.0],
   ];
 
-  this.components = ["walls", "floor", "ceiling"];
+  // TODO: Why does the wall have to be last for it to render?
+  this.components = ["ceiling", "floor", "walls"];
   this.loadedComponents = 0;
+  this.hasCompletedLoading = false;
 
   this._initTexture = function(component_name) {
     var component = this[component_name];
@@ -42,8 +45,8 @@ function Room(loadCompleteCallback) {
     component.texture = gl.createTexture();
     component.texture.image = new Image();
     component.texture.image.onload = function() {
-      handleLoadedTexture(component.texture)
-    }
+      this._handleLoadedTexture(component.texture);
+    }.bind(this);
     component.texture.image.src = component.textureMap;
   }
 
@@ -160,6 +163,18 @@ function Room(loadCompleteCallback) {
 		return lines;
   }
 
+  this._handleLoadedTexture = function(texture) {
+    gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+    gl.bindTexture(gl.TEXTURE_2D, texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+    gl.generateMipmap(gl.TEXTURE_2D);
+
+    gl.bindTexture(gl.TEXTURE_2D, null);
+
+    this._hasLoadedCheck();
+  }
 
   this._handleLoadedWorld = function(component, data) {
   	var lines;
@@ -248,14 +263,24 @@ function Room(loadCompleteCallback) {
     component.normalBuffer.itemSize = 3;
     component.normalBuffer.numItems = vertexCount;
 
+    this._hasLoadedCheck();
+  }
+
+  this._hasLoadedCheck = function() {
     this.loadedComponents++;
-    if (this.loadedComponents == this.components.length) {
+    // Check that both world and textures have loaded for all components
+    if (this.loadedComponents == this.components.length * 2) {
       // All components loaded
+      this.hasCompletedLoading = true;
       this.onLoadComplete();
     }
   }
 
   this.renderComponents = function() {
+    if (!this.hasCompletedLoading) {
+      return;
+    }
+
     for (var i in this.components) {
       var component_name = this.components[i];
       var component = this[component_name];
