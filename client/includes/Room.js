@@ -27,9 +27,10 @@ function Room(loadCompleteCallback) {
 		{ img: "greatwall.jpg", width: 1843, height: 746 }
   ];  
   this.paintingCoords = [
-  	[ 0.0, 0.55, -3.0 ],
-  	[ -1.5, 0.55, -3.0 ],
-  	[ -0.75, 0.55, -3.0],
+  	//{ origin: [ 0.0, 0.55, -3.0 ], dir: "n" },
+  	{ origin: [ -3.0, 0.55, 0 ], dir: "e" },
+  	{ origin: [ -1.5, 0.55, -3.0 ], dir: "n" },
+  	{ origin: [ -0.75, 0.55, 3.0], dir: "s" }
   ]; 
 
   this.components = ["walls", "floor", "ceiling"/*, "painting"*/];
@@ -66,8 +67,7 @@ function Room(loadCompleteCallback) {
   
   this._generatePainting = function(component/*, origin, direction*/) {		
 		
-		var maxWidth = 0.5, maxHeight = 0.5;
-		
+		var maxWidth = 0.9, maxHeight = 0.5;
 		var l = 0.04;    // thickness of painting
 		var w = maxWidth;
 		var h = component.height * (maxWidth / component.width);
@@ -77,11 +77,37 @@ function Room(loadCompleteCallback) {
 			w = component.width * (maxHeight / component.height);
 		}
 		
+		if (component.direction == "s") {
+			l = -l;
+		}
+		
 		var x = component.origin[0], y = component.origin[1], z = component.origin[2];
 
 		var v = [], r = [];
-		// origin is in middle of 4-5-6-7		
-		// below is actually only for far wall
+
+		/*********		
+			7 ------ 6
+		 / |      / |
+		0 -|---- 1  | (origin in middle of 4-5-6-7)
+		|  |     |  | ASCII art by yby
+		|  4 ----|- 5
+		| /      | /
+		3 ------ 2		
+		*************/
+		
+		
+		// N: x by y, depth z
+		// E: z by y, depth x
+		
+		// below is for east wall, middle is 1-6-5-2
+		
+		if (component.direction == "e" || component.direction == "w") {
+			var temp = x;
+			x = z;
+			z = temp;			
+		}
+
+		// below is actually only for north + south wall
 		
 		v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
 		v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
@@ -92,24 +118,27 @@ function Room(loadCompleteCallback) {
 		v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
 		v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];		
 		
+		/*r[0] = [ 0.0, 1.0 ];
+		r[1] = [ 0.0, 0.0 ];
+		r[2] = [ 1.0, 0.0 ];
+		r[3] = [ 1.0, 1.0 ];*/
+
 		r[0] = [ 0.0, 1.0 ];
 		r[1] = [ 0.0, 0.0 ];
 		r[2] = [ 1.0, 0.0 ];
 		r[3] = [ 1.0, 1.0 ];
 		
+		if (component.direction == "e" || component.direction == "w") {
+			for (var i in v) {
+				var temp = v[i][0];
+				v[i][0] = v[i][2];
+				v[i][2] = temp;			
+			}		
+		}
+
 		
 		// calculate triangles now!
-		/*********
-		
-			7 ------ 6
-		 / |      / |
-		0 -|---- 1  |
-		|  |     |  |
-		|  4 ----|- 5
-		| /      | /
-		3 ------ 2
-		
-		*************/		
+	
 		var vertices = [];
 		var textures = [];
 		
@@ -296,7 +325,8 @@ function Room(loadCompleteCallback) {
   			textureMap: this.paintingImages[i].img,
   			width: this.paintingImages[i].width,
   			height: this.paintingImages[i].height,
-  			origin: this.paintingCoords[i]
+  			origin: this.paintingCoords[i].origin,
+  			direction: this.paintingCoords[i].dir
   		};
   		var objName = "painting" + i;
   		this[objName] = painting;  		
