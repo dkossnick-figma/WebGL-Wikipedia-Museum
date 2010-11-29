@@ -29,6 +29,14 @@ function Room(loadCompleteCallback) {
     },
     textureMap: "textures/wallpaper.jpg"
   };
+  this.teapot = {
+    type: "object",
+    generate: function() {
+      var gen = new TeapotGenerator();
+      return gen;
+    },
+    textureMap: "textures/teapot.jpg"
+  };
 
   this.paintingImages = [
     { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
@@ -44,7 +52,7 @@ function Room(loadCompleteCallback) {
   ];
 
   // TODO: Why does the wall have to be last for it to render?
-  this.components = ["ceiling", "floor", "walls"];
+  this.components = ["ceiling", "floor", "walls", "teapot"];
   this.loadedComponents = 0;
   this.hasCompletedLoading = false;
 
@@ -68,6 +76,9 @@ function Room(loadCompleteCallback) {
       return;
     } else if (component.type == "generator") {
       this._handleLoadedWorld(component, component.generate());
+      return;
+    } else if (component.type == "object") {
+      this._handleLoadedObject(component, component.generate());
       return;
     }
 
@@ -103,18 +114,12 @@ function Room(loadCompleteCallback) {
     /*********
       7 ------ 6
      / |      / |
-    0 -|---- 1  | (origin in middle of 4-5-6-7)
-    |  |     |  | ASCII art by yby
+    0 -|---- 1  | (origin in middle of 4-5-6-7 for n/s
+    |  |     |  |                  and 1-6-5-2 for e/w)
     |  4 ----|- 5
     | /      | /
     3 ------ 2
     *************/
-
-
-    // N: x by y, depth z
-    // E: z by y, depth x
-
-    // below is for east wall, middle is 1-6-5-2
 
     // x-z coords switched for side walls
     if (component.direction == "e" || component.direction == "w") {
@@ -133,16 +138,6 @@ function Room(loadCompleteCallback) {
     v[6] = [ x + (w / 2.0), y + (h / 2.0), z ];
     v[7] = [ x - (w / 2.0), y + (h / 2.0), z ];
 
-    /*r[0] = [ 0.0, 1.0 ];
-    r[1] = [ 0.0, 0.0 ];
-    r[2] = [ 1.0, 0.0 ];
-    r[3] = [ 1.0, 1.0 ];
-    
-    0-1-2-3
-    3-2-1-0
-    
-    */
-
     r[0] = [ 0.0, 1.0 ];
     r[1] = [ 0.0, 0.0 ];
     r[2] = [ 1.0, 0.0 ];
@@ -160,7 +155,6 @@ function Room(loadCompleteCallback) {
         v[i][2] = temp;
       }
     }
-
 
     // calculate triangles now!
     var vertices = [];
@@ -227,10 +221,37 @@ function Room(loadCompleteCallback) {
 
     this._hasLoadedCheck();
   }
+  
+  this._handleLoadedObject = function(component, data) {
+    component.normalBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.normalBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.vertexNormals), gl.STATIC_DRAW);
+    component.normalBuffer.itemSize = 3;
+    component.normalBuffer.numItems = data.vertexNormals.length / 3;
+
+    component.textureCoordBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.textureCoordBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.vertexTextureCoords), gl.STATIC_DRAW);
+    component.textureCoordBuffer.itemSize = 2;
+    component.textureCoordBuffer.numItems = data.vertexTextureCoords.length / 2;
+
+    component.positionBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, component.positionBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data.vertexPositions), gl.STATIC_DRAW);
+    component.positionBuffer.itemSize = 3;
+    component.positionBuffer.numItems = data.vertexPositions.length / 3;
+
+    component.indexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, component.indexBuffer);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data.indices), gl.STREAM_DRAW);
+    component.indexBuffer.itemSize = 1;
+    component.indexBuffer.numItems = data.indices.length;
+    
+    this._hasLoadedCheck();
+  }
 
   this._handleLoadedWorld = function(component, data) {
     var lines;
-
     if (typeof data == "string") {
       lines = data.split("\n");
     } else {
@@ -356,8 +377,14 @@ function Room(loadCompleteCallback) {
         component.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
       setMatrixUniforms();
-      gl.drawArrays(gl.TRIANGLES, 0, component.positionBuffer.numItems);
-
+            
+      if (component.type == "object") {
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, component.indexBuffer);
+        gl.drawElements(gl.TRIANGLES, component.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
+      } else {
+        gl.drawArrays(gl.TRIANGLES, 0, component.positionBuffer.numItems);
+      }
+      
       mvPopMatrix();
     }
   }
