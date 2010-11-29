@@ -35,17 +35,16 @@ function Room(loadCompleteCallback) {
     textureMap: "textures/teapot.jpg"
   };
 
-  this.paintingImages = [
-    { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
-    { img: "Picasso_Portrait_of_Daniel-Henry_Kahnweiler_1910.jpg", width: 528, height: 720 },
-    { img: "mona-lisa-painting.jpg", width: 380, height: 600 },
-    { img: "mona-lisa-painting.jpg", width: 380, height: 600 }
-  ];
+  this.paintingImages = [];
   this.paintingCoords = [
-    { origin: [ -2.0, 0.55, 1.5 ], dir: "w" },
-    { origin: [ -1.5, 0.55, -2.0 ], dir: "n" },
-    { origin: [ -0.75, 0.55, 2.0 ], dir: "s" },
-    { origin: [ 2.0, 0.55, 1.5 ], dir: "e" }
+    { origin: [  1.25, 0.55, -2.0  ], dir: "n" },
+    { origin: [ -1.25, 0.55, -2.0  ], dir: "n" },
+    { origin: [  1.25, 0.55,  2.0  ], dir: "s" },
+    { origin: [ -1.25, 0.55,  2.0  ], dir: "s" },
+    { origin: [ -2.0,  0.55, -1.25 ], dir: "w" },
+    { origin: [ -2.0,  0.55,  1.25 ], dir: "w" },
+    { origin: [  2.0,  0.55, -1.25 ], dir: "e" },
+    { origin: [  2.0,  0.55,  1.25 ], dir: "e" }
   ];
 
   // TODO: Why does the wall have to be last for it to render?
@@ -61,7 +60,7 @@ function Room(loadCompleteCallback) {
     component.texture = gl.createTexture();
     component.texture.image = new Image();
     component.texture.image.onload = function() {
-      this._handleLoadedTexture(component.texture);
+      this._handleLoadedTexture(component);
     }.bind(this);
     component.texture.image.src = component.textureMap;
   }
@@ -139,7 +138,7 @@ function Room(loadCompleteCallback) {
     r[1] = [ 0.0, 0.0 ];
     r[2] = [ 1.0, 0.0 ];
     r[3] = [ 1.0, 1.0 ];
-    
+
     if (component.direction == "s" || component.direction == "w") {
       r.reverse();
     }
@@ -206,19 +205,24 @@ function Room(loadCompleteCallback) {
     return lines;
   }
 
-  this._handleLoadedTexture = function(texture) {
+  this._handleLoadedTexture = function(component) {
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-    gl.bindTexture(gl.TEXTURE_2D, texture);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, texture.image);
+    gl.bindTexture(gl.TEXTURE_2D, component.texture);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE,
+      component.texture.image);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.generateMipmap(gl.TEXTURE_2D);
 
     gl.bindTexture(gl.TEXTURE_2D, null);
 
-    this._hasLoadedCheck();
+    if (component.type == "painting") {
+      component.state++;
+    } else {
+      this._hasLoadedCheck();
+    }
   }
-  
+
   this._handleLoadedObject = function(component, data) {
     component.normalBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, component.normalBuffer);
@@ -243,8 +247,22 @@ function Room(loadCompleteCallback) {
     gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(data.indices), gl.STREAM_DRAW);
     component.indexBuffer.itemSize = 1;
     component.indexBuffer.numItems = data.indices.length;
-    
+
     this._hasLoadedCheck();
+  }
+
+  /*
+   * Destroys a component given a reference to the component.
+   * NOTE: Does not clean up this.allComponents, or the component itself.
+   */
+  this._destroyComponent = function(component) {
+    gl.deleteBuffer(component.normalBuffer);
+    gl.deleteBuffer(component.textureCoordBuffer);
+    gl.deleteBuffer(component.positionBuffer);
+    if (component.type == "object") {
+      gl.deleteBuffer(component.indexBuffer);
+    }
+    gl.deleteTexture(component.texture);
   }
 
   this._handleLoadedWorld = function(component, data) {
@@ -281,7 +299,6 @@ function Room(loadCompleteCallback) {
         vertexNormals.push(normal.e(3));
       }
     }
-
 
     for (var i in lines) {
       var vals;
@@ -333,7 +350,11 @@ function Room(loadCompleteCallback) {
     component.normalBuffer.itemSize = 3;
     component.normalBuffer.numItems = vertexCount;
 
-    this._hasLoadedCheck();
+    if (component.type == "painting") {
+      component.state++;
+    } else {
+      this._hasLoadedCheck();
+    }
   }
 
   this._hasLoadedCheck = function() {
@@ -351,9 +372,14 @@ function Room(loadCompleteCallback) {
       return;
     }
 
-    for (var i in this.components) {
-      var component_name = this.components[i];
+    for (var i in this.allComponents) {
+      var component_name = this.allComponents[i];
       var component = this[component_name];
+
+      // If this is a painting and it is not yet compeletely loaded, ignore.
+      if (component.type == "painting" && component.state < 2) {
+        continue;
+      }
 
       mvPushMatrix();
 
@@ -374,34 +400,54 @@ function Room(loadCompleteCallback) {
         component.positionBuffer.itemSize, gl.FLOAT, false, 0, 0);
 
       setMatrixUniforms();
-            
+
       if (component.type == "object") {
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, component.indexBuffer);
         gl.drawElements(gl.TRIANGLES, component.indexBuffer.numItems, gl.UNSIGNED_SHORT, 0);
       } else {
         gl.drawArrays(gl.TRIANGLES, 0, component.positionBuffer.numItems);
       }
-      
+
       mvPopMatrix();
     }
   }
 
-  this.initialize = function() {
-    // For each painting, add to component
-    for (var i in this.paintingImages) {
-      var painting = {
-        type: "painting",
-        textureMap: this.paintingImages[i].img,
-        width: this.paintingImages[i].width,
-        height: this.paintingImages[i].height,
-        origin: this.paintingCoords[i].origin,
-        direction: this.paintingCoords[i].dir
-      };
-      var objName = "painting" + i;
-      this[objName] = painting;
-      this.components.push(objName);
+  /**
+   * Removes any current paintings and frees their memory.
+   */
+  this.clearPaintings = function() {
+    for (var i = 0; i < this.paintingImages.length; i++) {
+      this._destroyComponent(this["painting" + i]);
+      delete this["painting" + i];
     }
+    this.paintingImages = [];
+    this.allComponents = this.components.slice();
+  }
 
+  this.addPainting = function(painting) {
+    // Add new painting and render it
+    var i = this.paintingImages.length;
+    this.paintingImages.push(painting);
+    var objName = "painting" + i;
+    var painting = {
+      type: "painting",
+      textureMap: this.paintingImages[i].img,
+      width: this.paintingImages[i].width,
+      height: this.paintingImages[i].height,
+      origin: this.paintingCoords[i].origin,
+      direction: this.paintingCoords[i].dir,
+      state: 0
+    };
+    this[objName] = painting;
+    this.allComponents.push(objName);
+
+    // Set off initialization for the painting
+    this._initTexture(objName);
+    this._loadWorld(objName);
+  }
+
+  this.initialize = function() {
+    this.allComponents = this.components.slice();
     // For each component, load the world and the texture
     for (var i in this.components) {
       var component_name = this.components[i];

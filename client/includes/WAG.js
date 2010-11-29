@@ -30,6 +30,8 @@ function WAG(canvas) {
       document.onkeydown = handleKeyDown;
       document.onkeyup = handleKeyUp;
 
+      $('#categoryChanger').submit(this.changeCategory);
+
       setInterval(function() {
         handleKeys();
         drawScene();
@@ -49,6 +51,42 @@ function WAG(canvas) {
         });
       });
     });
+  }
+
+  /**
+   * Callback called by /category/:cat
+   */
+  this.handleCategoryImages = function(data) {
+    if (data.resultCode != 0) {
+      alert("Error in retrieving category: " + data.resultCode);
+    } else {
+      $('#loadingtext').hide();
+      room.clearPaintings();
+      for (var i in data.data) {
+        var preload = new Image();
+        preload.onload = function() {
+          room.addPainting({
+            img: this.src,
+            width: this.width,
+            height: this.height
+          });
+        };
+        preload.src = data.data[i].thumb_url;
+      }
+    }
+  }
+
+  this.changeCategory = function() {
+    var category = $('#categoryInput').val();
+
+    $('#loadingtext').show();
+
+    // Since the node is on a different domain, we can't use Ajax.
+    $('head').append('<script type="text/javascript" '+
+      'src="http://node.art.kimbei.com/category/'+encodeURI(category)+
+      '"></script>');
+
+    return false;
   }
 
 }

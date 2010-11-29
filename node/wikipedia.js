@@ -29,8 +29,8 @@ function Wikipedia(domain) {
     return title.replace(/ /g, "_");
   }
 
-  this._normalizePageTitle = function(title) {
-    return title.replace(/^Image:/, "File:");
+  this.normalizePageTitle = function(title) {
+    return title.replace(/^Image:/, "File:").replace(/_/g, " ");
   }
 
   //
@@ -52,11 +52,12 @@ function Wikipedia(domain) {
       if (data.query && data.query.pages) {
         for (var i in data.query.pages) {
           var image = data.query.pages[i];
+          image.title = this.normalizePageTitle(image.title);
           images[image.title] = image.imageinfo[0].thumburl;
         }
       }
       cb(images);
-    });
+    }.bind(this));
   }
 
   this.getCategoryImages = function(cmtitle, continuekey, cb) {
@@ -98,8 +99,16 @@ function Wikipedia(domain) {
             title: page.title
           };
           if (page.images) {
-            page_stage.image_title = page.images[0].title;
-          } else {
+            for (var i in page.images) {
+              var title = page.images[i].title;
+              if (title.match(jpeg_regex)) {
+                page_stage.image_title = this.normalizePageTitle(title);
+              }
+            }
+          }
+
+          // If page.images didn't contain a valid image...
+          if (!page_stage.image_title) {
             var content = page.revisions[0]['*'];
             var matches = content.match(overall_regex);
             if (matches) {
@@ -107,7 +116,7 @@ function Wikipedia(domain) {
                 var title_matches = matches[i].match(title_regex);
                 var title = title_matches[1];
                 if (title.match(jpeg_regex)) {
-                  page_stage.image_title = this._normalizePageTitle(title);
+                  page_stage.image_title = this.normalizePageTitle(title);
                 }
               }
             }

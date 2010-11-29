@@ -28,11 +28,20 @@ app.get("/", function(req, res) {
   });
 });
 
+function wrapResponse(responseData, responseFunc) {
+  return responseFunc + "(" + JSON.stringify(responseData) + ");";
+}
+
+function sendWrappedError(res, errorCode, responseFunc) {
+  res.send(wrapResponse({
+    resultCode: errorCode
+  }, responseFunc));
+}
+
 function handleCategoryImages(req, res, data) {
   if (data.pages.length == 0) {
-    res.send({
-      resultCode: WAGConsts.EMPTY_CATEGORY
-    });
+    sendWrappedError(res, WAGConsts.EMPTY_CATEGORY,
+      "WAGinstance.handleCategoryImages");
     return;
   }
 
@@ -53,10 +62,11 @@ function handleCategoryImages(req, res, data) {
         data.pages[i].thumb_url = thumbdata[image_title];
       } else {
         console.error("CONSISTENCY: Did not retrieve thumb for "+image_title);
-        res.send({
-          resultCode: WAGConsts.UNKNOWN
-        });
-        return;
+        console.log(thumbdata);
+        //sendWrappedError(res, WAGConsts.UNKNOWN,
+        //  "WAGinstance.handleCategoryImages");
+        //return;
+        continue;
       }
     }
     var result = {
@@ -64,7 +74,7 @@ function handleCategoryImages(req, res, data) {
       data: data.pages
     };
     result.hasMore = !!data.continuekey;
-    res.send(result);
+    res.send(wrapResponse(result, "WAGinstance.handleCategoryImages"));
   });
 }
 

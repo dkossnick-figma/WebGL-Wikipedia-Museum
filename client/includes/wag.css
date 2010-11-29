@@ -9,6 +9,7 @@ body {
   left:150px;
   font-size:2em;
   color: white;
+  text-shadow: 2px 1px 3px #111111;
 }
 
 #parameterTable {
@@ -20,6 +21,15 @@ body {
   padding-right: 10px;
 }
 
+#parameterTable th.secondTH {
+  padding-left: 15px;
+}
+
 input[type=text] {
   width: 30px;
+  border: 1px solid #BDC7D8;
+  padding: 3px;
+}
+#categoryInput {
+  width: 300px;
 }

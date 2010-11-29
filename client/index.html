@@ -214,7 +214,7 @@
 <body>
   <canvas id="wagCanvas" style="border: none;" width="800" height="500"></canvas>
 
-  <div id="loadingtext">Loading world...</div>
+  <div id="loadingtext">Loading...</div>
 
   <br/>
 Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page Down</code> to
@@ -234,9 +234,7 @@ look up and down.<br/>
 <td>X: <input type="text" id="lightPositionX" value="-1.5" /></td>
 <td>Y: <input type="text" id="lightPositionY" value="0.5" /></td>
 <td>Z: <input type="text" id="lightPositionZ" value="-1.5" /></td>
-</tr>
-<tr>
-<th>Colour:</th>
+<th class="secondTH">Colour:</th>
 <td>R: <input type="text" id="pointR" value="0.6" /></td>
 <td>G: <input type="text" id="pointG" value="0.6" /></td>
 <td>B: <input type="text" id="pointB" value="0.6" /></td>
@@ -246,17 +244,24 @@ look up and down.<br/>
 <td>R: <input type="text" id="ambientR" value="0.5" /></td>
 <td>G: <input type="text" id="ambientG" value="0.5" /></td>
 <td>B: <input type="text" id="ambientB" value="0.5" /></td>
-</tr>
-<tr>
-<th>Spotlight Direction:</th>
+<th class="secondTH">Spotlight Direction:</th>
 <td>X: <input type="text" id="directionX" value="0" /></td>
 <td>Y: <input type="text" id="directionY" value="0" /></td>
 <td>Z: <input type="text" id="directionZ" value="1" /></td>
 </tr>
 <tr>
 <th>Spotlight Params:</th>
-<td colspan="3">Inner Angle: <input type="text" id="inner_angle" value="0.6" />
+<td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.6" />
 &nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.7" /></td>
+</tr>
+<tr>
+<th>Category:</th>
+<td colspan="7">
+<form id="categoryChanger">
+<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" />
+<input type="submit" value="Go" />
+</form>
+</td>
 </tr>
 </table>
 
