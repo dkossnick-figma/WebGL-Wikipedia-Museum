@@ -59,19 +59,28 @@ function Wikipedia(domain) {
     });
   }
 
-  this.getCategoryImages = function(cmtitle, cb) {
-    this._sendRequest({
+  this.getCategoryImages = function(cmtitle, continuekey, cb) {
+    var request = {
       generator: "categorymembers",
       gcmtitle: cmtitle,
-      gcmlimit: 10,
+      gcmlimit: 8,
       action: "query",
       prop: "images|revisions",
       imlimit: 1,
       rvprop: "content",
       rvexpandtemplates: 1,
       rvsection: 0
-    }, function(data) {
-      var pages = [];
+    };
+
+    if (continuekey) {
+      request.gcmcontinue = continuekey;
+    }
+
+    this._sendRequest(request, function(data) {
+      var result = {
+        title: cmtitle,
+        pages: []
+      };
       if (data.query && data.query.pages) {
         var overall_regex = /\[\[((?:[Ii]mage|[Ff]ile):.+?)(?:\||\]\])/g,
             title_regex = /\[\[((?:[Ii]mage|[Ff]ile):.+?)(?:\||\]\])/,
@@ -105,11 +114,17 @@ function Wikipedia(domain) {
           }
           // Only return page if an image was found for it
           if (page_stage.image_title) {
-            pages.push(page_stage);
+            result.pages.push(page_stage);
           }
         }
+
+        if (data["query-continue"] &&
+            data["query-continue"]["categorymembers"]) {
+          result.continuekey =
+            data["query-continue"]["categorymembers"].gcmcontinue;
+        }
       }
-      cb(pages);
+      cb(result);
     }.bind(this));
   }
 }
