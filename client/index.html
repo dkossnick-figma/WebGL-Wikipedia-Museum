@@ -20,31 +20,10 @@
   var WAGinstance;
   var room;
   var gl;
-
   var currentProgram;
-  var perVertexProgram;
-  var perFragmentProgram;
-  var spotlightProgram;
 
-  var WAGConfig = {
-    programs: {
-      perVertex: {
-        fragment: "includes/shader-fs.frag",
-        vertex:   "includes/shader-vs.vert"
-      },
-      perFragment: {
-        fragment: "includes/lighting-fs.frag",
-        vertex:   "includes/lighting-vs.vert"
-      },
-      spotlight: {
-        fragment: "includes/spotlight-fs.frag",
-        vertex:   "includes/spotlight-vs.vert"
-      }
-    }
-  }
-
-  function getShader(gl, id, shader_type, cb) {
-    var shaderScript = WAGConfig.programs[id];
+  function getShader(id, shader_type, cb) {
+    var shaderScript = WAGinstance.programs[id];
     if (!shaderScript) {
       return null;
     }
@@ -79,8 +58,8 @@
   }
 
   function createProgram(program_id, cb) {
-    getShader(gl, program_id, "fragment", function(fragmentShader) {
-      getShader(gl, program_id, "vertex", function(vertexShader) {
+    getShader(program_id, "fragment", function(fragmentShader) {
+      getShader(program_id, "vertex", function(vertexShader) {
         var program = gl.createProgram();
         gl.attachShader(program, vertexShader);
         gl.attachShader(program, fragmentShader);
@@ -137,11 +116,11 @@
     perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 
     if (document.getElementById("per-fragment-radio").checked) {
-      currentProgram = perFragmentProgram;
+      currentProgram = WAGinstance.perFragmentProgram;
     } else if (document.getElementById("per-vertex-radio").checked) {
-      currentProgram = perVertexProgram;
+      currentProgram = WAGinstance.perVertexProgram;
     } else if (document.getElementById("spotlight-radio").checked) {
-      currentProgram = spotlightProgram;
+      currentProgram = WAGinstance.spotlightProgram;
     }
     gl.useProgram(currentProgram);
 

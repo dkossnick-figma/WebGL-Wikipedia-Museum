@@ -1,6 +1,25 @@
 function WAG(canvas) {
   this.canvas = document.getElementById(canvas);
 
+  this.perVertexProgram = null;
+  this.perFragmentProgram = null;
+  this.spotlightProgram = null;
+
+  this.programs = {
+    perVertex: {
+      fragment: "includes/shader-fs.frag",
+      vertex:   "includes/shader-vs.vert"
+    },
+    perFragment: {
+      fragment: "includes/lighting-fs.frag",
+      vertex:   "includes/lighting-vs.vert"
+    },
+    spotlight: {
+      fragment: "includes/spotlight-fs.frag",
+      vertex:   "includes/spotlight-vs.vert"
+    }
+  };
+
   this.initialize = function() {
     try {
       gl = this.canvas.getContext("experimental-webgl");
@@ -41,16 +60,17 @@ function WAG(canvas) {
   }
 
   this.initShaders = function(cb) {
+    // No need for per-fragment shader to wait for the other shaders
     createProgram("perFragment", function(prog) {
-      perFragmentProgram = prog;
-      createProgram("spotlight", function(prog) {
-        spotlightProgram = prog;
-        createProgram("perVertex", function(prog) {
-          perVertexProgram = prog;
-          cb();
-        });
-      });
-    });
+      this.perFragmentProgram = prog;
+      cb();
+    }.bind(this));
+    createProgram("spotlight", function(prog) {
+      this.spotlightProgram = prog;
+    }.bind(this));
+    createProgram("perVertex", function(prog) {
+      this.perVertexProgram = prog;
+    }.bind(this));
   }
 
   /**
