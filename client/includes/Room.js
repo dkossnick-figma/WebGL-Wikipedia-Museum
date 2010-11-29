@@ -31,10 +31,7 @@ function Room(loadCompleteCallback) {
   };
   this.teapot = {
     type: "object",
-    generate: function() {
-      var gen = new TeapotGenerator();
-      return gen;
-    },
+    generate: TeapotGenerator,
     textureMap: "textures/teapot.jpg"
   };
 

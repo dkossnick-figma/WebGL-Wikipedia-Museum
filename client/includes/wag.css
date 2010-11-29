@@ -17,4 +17,9 @@ body {
 
 #parameterTable th {
   text-align: left;
+  padding-right: 10px;
+}
+
+input[type=text] {
+  width: 30px;
 }

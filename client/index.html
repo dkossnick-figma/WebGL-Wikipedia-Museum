@@ -48,7 +48,7 @@
     if (!shaderScript) {
       return null;
     }
-    
+
     $.ajax({
       url: shaderScript[shader_type],
       dataType: "text",
@@ -61,7 +61,7 @@
         } else {
           cb(null);
         }
-        
+
         gl.shaderSource(shader, data);
         gl.compileShader(shader);
 
@@ -69,7 +69,7 @@
           console.error("Error compiling shader: "+gl.getShaderInfoLog(shader));
           cb(null);
         }
-        
+
         cb(shader);
       },
       error: function(xhr, textStatus, errorThrown) {
@@ -77,7 +77,7 @@
       }
     });
   }
-  
+
   function createProgram(program_id, cb) {
     getShader(gl, program_id, "fragment", function(fragmentShader) {
       getShader(gl, program_id, "vertex", function(vertexShader) {
@@ -89,16 +89,16 @@
         if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
           alert("Could not initialise shaders");
         }
-    
+
         program.vertexPositionAttribute = gl.getAttribLocation(program, "aVertexPosition");
         gl.enableVertexAttribArray(program.vertexPositionAttribute);
-    
+
         program.vertexNormalAttribute = gl.getAttribLocation(program, "aVertexNormal");
         gl.enableVertexAttribArray(program.vertexNormalAttribute);
-    
+
         program.textureCoordAttribute = gl.getAttribLocation(program, "aTextureCoord");
         gl.enableVertexAttribArray(program.textureCoordAttribute);
-    
+
         program.pMatrixUniform = gl.getUniformLocation(program, "uPMatrix");
         program.mvMatrixUniform = gl.getUniformLocation(program, "uMVMatrix");
         program.nMatrixUniform = gl.getUniformLocation(program, "uNMatrix");
@@ -169,19 +169,19 @@
         parseFloat(document.getElementById("pointG").value),
         parseFloat(document.getElementById("pointB").value)
       );
-      
+
       gl.uniform3f(
         currentProgram.pointLightingDirectionUniform,
         parseFloat(document.getElementById("directionX").value),
         parseFloat(document.getElementById("directionY").value),
         parseFloat(document.getElementById("directionZ").value)
       );
-      
+
       gl.uniform1f(
         currentProgram.innerAngleUniform,
         parseFloat(document.getElementById("inner_angle").value)
       );
-      
+
       gl.uniform1f(
         currentProgram.outerAngleUniform,
         parseFloat(document.getElementById("outer_angle").value)
@@ -192,7 +192,7 @@
     gl.uniform1i(currentProgram.useTexturesUniform, textures);
 
     loadIdentity();
-    
+
     mvRotate(-pitch, [1, 0, 0]);
     mvRotate(-yaw, [0, 1, 0]);
     mvTranslate([-xPos, -yPos, -zPos]);
@@ -221,12 +221,11 @@ Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page D
 look up and down.<br/>
   <br/>
 
-<input type="checkbox" id="lighting" checked="checked" /> Use lighting
-<input type="checkbox" id="textures" checked="checked" /> Use textures
-Shader program:
-<input type="radio" name="shader" id="per-vertex-radio" value="per-vertex" /> Per-vertex
-<input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment
-<input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight
+<label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
+<label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
+<label for="per-vertex-radio"><input type="radio" name="shader" id="per-vertex-radio" value="per-vertex" /> Per-vertex</label>
+<label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
+<label for="spotlight-radio"><input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight</label>
 <br/>
 
 <table id="parameterTable">
@@ -256,8 +255,8 @@ Shader program:
 </tr>
 <tr>
 <th>Spotlight Params:</th>
-<td>Inner Angle: <input type="text" id="inner_angle" value="0.6" /></td>
-<td>Outer Angle: <input type="text" id="outer_angle" value="0.7" /></td>
+<td colspan="3">Inner Angle: <input type="text" id="inner_angle" value="0.6" />
+&nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.7" /></td>
 </tr>
 </table>
 
