@@ -39,6 +39,15 @@ function mvRotate(ang, v) {
   multMatrix(m);
 }
 
+// added by Yuhki
+function mvScale(s) {
+  var m = Matrix.create([[s, 0, 0, 0],
+                         [0, s, 0, 0],
+                         [0, 0, s, 0],
+                         [0, 0, 0, 1]]);
+  multMatrix(m);
+}
+
 function perspective(fovy, aspect, znear, zfar) {
   pMatrix = makePerspective(fovy, aspect, znear, zfar);
 }

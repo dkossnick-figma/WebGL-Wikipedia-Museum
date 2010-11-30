@@ -124,7 +124,7 @@ function Room(loadCompleteCallback) {
       z = temp;
     }
 
-    // below is actually only for north + south wall
+    // calculate critical points
     v[0] = [ x - (w / 2.0), y + (h / 2.0), z + l ];
     v[1] = [ x + (w / 2.0), y + (h / 2.0), z + l ];
     v[2] = [ x + (w / 2.0), y - (h / 2.0), z + l ];
