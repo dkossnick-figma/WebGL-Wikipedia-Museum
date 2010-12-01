@@ -37,6 +37,15 @@ function Wikipedia(domain) {
   // API Methods
   //
 
+  this.getCategoryMembers = function(category, cb) {
+    this._sendRequest({
+      action: "query",
+      list: "categorymembers",
+      cmtitle: category,
+      cmlimit: 500
+    }, cb);
+  }
+
   this.getImageThumbs = function(titles, width, cb) {
     for (var i in titles) {
       titles[i] = this._convertTitleToURLStyle(titles[i]);

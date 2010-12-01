@@ -4,18 +4,20 @@
  */
 
 var http = require("http"),
+    fs = require("fs"),
     sys = require("sys"),
     express = require("express"),
     wikipedia = require("./wikipedia"),
     WAGConsts = require("../shared/WAGConsts");
 
-var puts = sys.puts,
-    inspect = sys.inspect;
-
-process.addListener("uncaughtException", function(e) {
-  puts(inspect(e));
+process.on("uncaughtException", function(err) {
+  console.error("Caught uncaught exception: " + err);
 });
 
+// Read in files
+var catWhitelist = fs.readFileSync("catwhitelist.list", "utf-8").split("\n");
+
+// Create the server
 var app = express.createServer();
 app.use(express.cookieDecoder());
 app.use(express.session());

@@ -1,3 +1,7 @@
 This is a WebGL-based 3d application that allows you to navigate around a virtual museum filled with artwork from Wikipedia.
 
 Some of the source code was based on lessons from www.learningwebgl.com/lessons. Many thanks!
+
+Server
+------
+WAG's backend is written in node.js. It requires the "async" module (available through npm) and the "restler" module (check out from https://github.com/danwrong/restler).
