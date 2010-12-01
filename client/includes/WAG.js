@@ -101,4 +101,10 @@ function WAG(canvas) {
     return false;
   }
 
+  this.onTeleport = function() {
+    $(this.canvas).fadeOut(300, function() {
+      $(this.canvas).fadeIn(300);
+    }.bind(this));
+  }
+
 }
