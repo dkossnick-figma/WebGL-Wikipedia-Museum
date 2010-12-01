@@ -117,8 +117,6 @@
 
     if (document.getElementById("per-fragment-radio").checked) {
       currentProgram = WAGinstance.perFragmentProgram;
-    } else if (document.getElementById("per-vertex-radio").checked) {
-      currentProgram = WAGinstance.perVertexProgram;
     } else if (document.getElementById("spotlight-radio").checked) {
       currentProgram = WAGinstance.spotlightProgram;
     }
@@ -202,7 +200,6 @@ look up and down.<br/>
 
 <label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
 <label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
-<label for="per-vertex-radio"><input type="radio" name="shader" id="per-vertex-radio" value="per-vertex" /> Per-vertex</label>
 <label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
 <label for="spotlight-radio"><input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight</label>
 <br/>
