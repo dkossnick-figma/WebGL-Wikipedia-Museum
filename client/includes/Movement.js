@@ -93,7 +93,7 @@ function animate() {
     // tunnel teleport!!!
     if ((Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0 && // top and bottom tunnels
          Math.abs(xPos) >= 1.5 && Math.abs(xPos) <= 2.0) ||
-        (Math.abs(zPos) >= 0.5 && Math.abs(zPos) <= 1.5 &&
+        (Math.abs(zPos) >= 1.5 && Math.abs(zPos) <= 2.0 &&
          Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0)) // left and right tunnels
     {
       zPos *= -1;
