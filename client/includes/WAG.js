@@ -1,15 +1,10 @@
 function WAG(canvas) {
   this.canvas = document.getElementById(canvas);
 
-  this.perVertexProgram = null;
   this.perFragmentProgram = null;
   this.spotlightProgram = null;
 
   this.programs = {
-    perVertex: {
-      fragment: "includes/shader-fs.frag",
-      vertex:   "includes/shader-vs.vert"
-    },
     perFragment: {
       fragment: "includes/lighting-fs.frag",
       vertex:   "includes/lighting-vs.vert"
@@ -67,9 +62,6 @@ function WAG(canvas) {
     }.bind(this));
     createProgram("spotlight", function(prog) {
       this.spotlightProgram = prog;
-    }.bind(this));
-    createProgram("perVertex", function(prog) {
-      this.perVertexProgram = prog;
     }.bind(this));
   }
 

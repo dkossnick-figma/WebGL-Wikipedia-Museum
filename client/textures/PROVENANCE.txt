@@ -1,0 +1,6 @@
+Provenance of Textures
+======================
+
+* plank.jpg - http://www.bittbox.com/all/photoshop-tutorial-make-a-cool-3d-room-from-scratch
+* wallpaper.jpg - http://casitablog.blogspot.com/2010_04_01_archive.html
+* teapot.jpg - http://learningwebgl.com/blog/?p=1658
