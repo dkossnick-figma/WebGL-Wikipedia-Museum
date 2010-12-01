@@ -16,16 +16,16 @@ function Room(loadCompleteCallback) {
   this.floor = {
     type: "generator",
     generate: function() {
-      return [[-4,0,-4,0,16],[-4,0,4,0,0],[4,0,4,10.18,0],
-              [-4,0,-4,0,16],[4,0,-4,10.18,16],[4,0,4,10.18,0]];
+      return [[-5,0,-5,0,20],[-5,0,5,0,0],[5,0,5,12.725,0],
+              [-5,0,-5,0,20],[5,0,-5,12.725,20],[5,0,5,12.725,0]];
     },
     textureMap: "textures/plank.jpg"
   };
   this.ceiling = {
     type: "generator",
     generate: function() {
-      return [[-4,1,-4,0,8],[-4,1,4,0,0],[4,1,4,8,0],
-              [-4,1,-4,0,8],[4,1,-4,8,8],[4,1,4,8,0]];
+      return [[-5,1,-5,0,10],[-5,1,5,0,0],[5,1,5,10,0],
+              [-5,1,-5,0,10],[5,1,-5,10,10],[5,1,5,10,0]];
     },
     textureMap: "textures/wallpaper.jpg"
   };

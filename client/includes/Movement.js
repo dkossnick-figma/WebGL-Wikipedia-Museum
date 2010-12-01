@@ -65,30 +65,64 @@ function handleKeys() {
 
 function animate() {
   var timeNow = new Date().getTime();
-  var newZPos = zPos;
+  var newZPos = zPos, oldZPos = zPos;
+  var newXPos = xPos, oldXPos = xPos;
   if (lastTime != 0) {
     var elapsed = timeNow - lastTime;
 
-    // Check for collision. If too close to an object, do not update position, yaw, pitch, etc.
-    //if (vertexPositions != null)
-      //  console.log(vertexPositions);
-
     if (speed != 0) {
-      xPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
+      newXPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
       newZPos = zPos - Math.cos(yaw * piOver180) * speed * elapsed;
+      
+      // collision detection with potential future coords in x-z plane
+      if ((inrange(newXPos, -2, 2) && inrange(newZPos, -2, 2))
+          || (inrange(newXPos, -0.5, 0.5) && inrange(newZPos, -4, 4))
+          || (inrange(newXPos, -4, 4) && inrange(newZPos, -0.5, 0.5))
+          || (inrange(newXPos, -3.85, 0.5) && inrange(newZPos, -4, -3))
+          || (inrange(newXPos, -0.5, 3.85) && inrange(newZPos, 3, 4))
+          || (inrange(newXPos, -4, -3) && inrange(newZPos, -0.5, 3.85))
+          || (inrange(newXPos, 3, 4) && inrange(newZPos, -3.85, 0.5))) {
+        xPos = newXPos;
+        zPos = newZPos;
+      }
+      
+      // TODO: collision detection with other objects in room
 
       joggingAngle += elapsed * 0.6;  // 0.6 "fiddle factor" - makes it feel more realistic :-)
-      yPos = Math.sin(joggingAngle * piOver180) / 20 + 0.4
+      yPos = Math.sin(joggingAngle * piOver180) / 20 + 0.4;
+
+      // tunnel teleport!!!
+      var buff = 0.1; // prevent users from being stuck at +/-[1.95, 2.0]
+      
+      // teleport between (1) top/bottom and (2) left/right tunnels
+      if (Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0 
+          && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.0) {
+        zPos *= -1;        
+        var displace = (oldXPos < xPos) ? buff : -buff;
+        xPos = -xPos + displace;
+          
+      } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.0
+                 && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0) {
+        xPos *= -1;
+        var displace = (oldZPos < zPos) ? buff : -buff;
+        zPos = -zPos + displace;
+      }
     }
-    // only update if zPos is
-    if ((zPos >= 1.5 && newZPos < zPos) || zPos < 1.5) {
-        //console.log("collision: " + xPos + " " + yPos + " " + zPos);
-        zPos = newZPos;
-    }
+
+
+
 
     yaw += yawRate * elapsed;
     pitch += pitchRate * elapsed;
 
   }
   lastTime = timeNow;
+}
+
+function inrange(pos, min, max) {
+  var buff = 0.15;
+  if (pos > (min + buff) && pos < (max - buff)) {
+    return true;
+  }
+  return false;
 }

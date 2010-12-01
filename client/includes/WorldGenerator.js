@@ -103,21 +103,30 @@ function WorldGenerator() {
     },
     // G near A
     {
-      s: 2.0,
+      s: 3.0,
       t: 1,
-      width: 2.0,
+      width: 3.0,
       height: 1.0,
-      origin: [-1.5, 1.0, -4.0],
+      origin: [-2.5, 1.0, -4.0],
       dir: "x"
     },
     // F near A
     {
-      s: 1.0,
+      s: 3.0,
       t: 1,
-      width: 1.0,
+      width: 3.0,
       height: 1.0,
-      origin: [-1.5, 1.0, -3.0],
+      origin: [-3.5, 1.0, -3.0],
       dir: "x"
+    },
+    // I near A
+    {
+      s: 2.0,
+      t: 1,
+      width: 2.0,
+      height: 1.0,
+      origin: [-3.5, 1.0, -5.0],
+      dir: "z"
     },
 
     // E near B
@@ -140,21 +149,30 @@ function WorldGenerator() {
     },
     // G near B
     {
-      s: 2.0,
+      s: 3.0,
       t: 1,
-      width: 2.0,
+      width: 3.0,
       height: 1.0,
       origin: [-0.5, 1.0, 4.0],
       dir: "x"
     },
     // F near B
     {
-      s: 1.0,
+      s: 3.0,
       t: 1,
-      width: 1.0,
+      width: 3.0,
       height: 1.0,
       origin: [0.5, 1.0, 3.0],
       dir: "x"
+    },
+    // I near B
+    {
+      s: 2.0,
+      t: 1,
+      width: 2.0,
+      height: 1.0,
+      origin: [3.5, 1.0, 3.0],
+      dir: "z"
     },
 
     // E near C
@@ -177,23 +195,32 @@ function WorldGenerator() {
     },
     // G near C
     {
-      s: 2.0,
+      s: 3.0,
       t: 1,
-      width: 2.0,
+      width: 3.0,
       height: 1.0,
       origin: [-4.0, 1.0, -0.5],
       dir: "z"
     },
     // F near C
     {
-      s: 1.0,
+      s: 3.0,
       t: 1,
-      width: 1.0,
+      width: 3.0,
       height: 1.0,
       origin: [-3.0, 1.0, 0.5],
       dir: "z"
     },
-
+    // I near C
+    {
+      s: 2.0,
+      t: 1,
+      width: 2.0,
+      height: 1.0,
+      origin: [-5.0, 1.0, 3.5],
+      dir: "x"
+    },
+    
     // E near D
     {
       s: 1,
@@ -214,21 +241,30 @@ function WorldGenerator() {
     },
     // G near D
     {
-      s: 2.0,
+      s: 3.0,
       t: 1,
-      width: 2.0,
+      width: 3.0,
       height: 1.0,
-      origin: [4.0, 1.0, -1.5],
+      origin: [4.0, 1.0, -2.5],
       dir: "z"
     },
     // F near D
     {
-      s: 1.0,
+      s: 3.0,
       t: 1,
-      width: 1.0,
+      width: 3.0,
       height: 1.0,
-      origin: [3.0, 1.0, -1.5],
+      origin: [3.0, 1.0, -3.5],
       dir: "z"
+    },
+    // I near D
+    {
+      s: 2.0,
+      t: 1,
+      width: 2.0,
+      height: 1.0,
+      origin: [3.0, 1.0, -3.5],
+      dir: "x"
     }
   ];
 
