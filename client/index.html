@@ -239,84 +239,84 @@
 
 <body>
   <canvas id="wagCanvas" style="border: none;" width="800" height="500"></canvas>
-
+ 
   <div id="loadingtext">Loading...</div>
 
   <br/>
-Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page Down</code> to
-look up and down.<br/>
-  <br/>
-
-<div id="debug"></div>
-<div id="debug2"></div>
-  
-<label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
-<label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
-<label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
-<label for="spotlight-radio"><input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight</label>
-<br/>
-
-<table id="parameterTable">
-<tr>
-<th>Position1:</th>
-<td>X: <input type="text" id="lightPositionX1" value="0" /></td>
-<td>Y: <input type="text" id="lightPositionY1" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ1" value="0" /></td>
-<th>Position2:</th>
-<td>X: <input type="text" id="lightPositionX2" value="-1.5" /></td>
-<td>Y: <input type="text" id="lightPositionY2" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ2" value="-1.5" /></td>
-<th>Position3:</th>
-<td>X: <input type="text" id="lightPositionX3" value="1.0" /></td>
-<td>Y: <input type="text" id="lightPositionY3" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ3" value="-1.5" /></td>
-<th>Position4:</th>
-<td>X: <input type="text" id="lightPositionX4" value="0.7" /></td>
-<td>Y: <input type="text" id="lightPositionY4" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ4" value="1.4" /></td>
-<th class="secondTH">Colour:</th>
-<td>R: <input type="text" id="pointR" value="0.5" /></td>
-<td>G: <input type="text" id="pointG" value="0.5" /></td>
-<td>B: <input type="text" id="pointB" value="0.5" /></td>
-</tr>
-<tr>
-<th>Ambient Colour:</th>
-<td>R: <input type="text" id="ambientR" value="0.5" /></td>
-<td>G: <input type="text" id="ambientG" value="0.5" /></td>
-<td>B: <input type="text" id="ambientB" value="0.5" /></td>
-<th class="secondTH">Spotlight Direction1:</th>
-<td>X: <input type="text" id="directionX1" value="0" /></td>
-<td>Y: <input type="text" id="directionY1" value="0.4" /></td>
-<td>Z: <input type="text" id="directionZ1" value="0" /></td>
-<th class="secondTH">Spotlight Direction2:</th>
-<td>X: <input type="text" id="directionX2" value="1" /></td>
-<td>Y: <input type="text" id="directionY2" value=".5" /></td>
-<td>Z: <input type="text" id="directionZ2" value="1" /></td>
-<th class="secondTH">Spotlight Direction3:</th>
-<td>X: <input type="text" id="directionX3" value="0" /></td>
-<td>Y: <input type="text" id="directionY3" value="0.3" /></td>
-<td>Z: <input type="text" id="directionZ3" value="-1" /></td>
-<th class="secondTH">Spotlight Direction4:</th>
-<td>X: <input type="text" id="directionX4" value="0" /></td>
-<td>Y: <input type="text" id="directionY4" value="0" /></td>
-<td>Z: <input type="text" id="directionZ4" value="1" /></td>
-</tr>
-<tr>
-<th>Spotlight Params:</th>
-<td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.1" />
-&nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.9" /></td>
-</tr>
-<tr>
-<th>Category:</th>
-<td colspan="7">
-<form id="categoryChanger">
-<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" disabled="disabled" />
-<input type="submit" value="Go" disabled="disabled" />
-</form>
-</td>
-</tr>
-</table>
-
+Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page Down</code> (fn arrow keys on Mac) to
+look up and down.
+  <span id="advanced_visibility" onClick='$("#advanced").toggle();'>Advanced</span>
+<div id="advanced" style="display:none;">
+    <div id="debug"></div>
+    <div id="debug2"></div>
+      
+    <label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
+    <label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
+    <label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
+    <label for="spotlight-radio"><input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight</label>
+    <br/>
+    
+    <table id="parameterTable">
+    <tr>
+    <th>Position1:</th>
+    <td>X: <input type="text" id="lightPositionX1" value="0" /></td>
+    <td>Y: <input type="text" id="lightPositionY1" value="0.5" /></td>
+    <td>Z: <input type="text" id="lightPositionZ1" value="0" /></td>
+    <th>Position2:</th>
+    <td>X: <input type="text" id="lightPositionX2" value="-1.5" /></td>
+    <td>Y: <input type="text" id="lightPositionY2" value="0.5" /></td>
+    <td>Z: <input type="text" id="lightPositionZ2" value="-1.5" /></td>
+    <th>Position3:</th>
+    <td>X: <input type="text" id="lightPositionX3" value="1.0" /></td>
+    <td>Y: <input type="text" id="lightPositionY3" value="0.5" /></td>
+    <td>Z: <input type="text" id="lightPositionZ3" value="-1.5" /></td>
+    <th>Position4:</th>
+    <td>X: <input type="text" id="lightPositionX4" value="0.7" /></td>
+    <td>Y: <input type="text" id="lightPositionY4" value="0.5" /></td>
+    <td>Z: <input type="text" id="lightPositionZ4" value="1.4" /></td>
+    <th class="secondTH">Colour:</th>
+    <td>R: <input type="text" id="pointR" value="0.5" /></td>
+    <td>G: <input type="text" id="pointG" value="0.5" /></td>
+    <td>B: <input type="text" id="pointB" value="0.5" /></td>
+    </tr>
+    <tr>
+    <th class="secondTH">Spotlight Direction1:</th>
+    <td>X: <input type="text" id="directionX1" value="0" /></td>
+    <td>Y: <input type="text" id="directionY1" value="0.4" /></td>
+    <td>Z: <input type="text" id="directionZ1" value="0" /></td>
+    <th class="secondTH">Spotlight Direction2:</th>
+    <td>X: <input type="text" id="directionX2" value="1" /></td>
+    <td>Y: <input type="text" id="directionY2" value=".5" /></td>
+    <td>Z: <input type="text" id="directionZ2" value="1" /></td>
+    <th class="secondTH">Spotlight Direction3:</th>
+    <td>X: <input type="text" id="directionX3" value="0" /></td>
+    <td>Y: <input type="text" id="directionY3" value="0.3" /></td>
+    <td>Z: <input type="text" id="directionZ3" value="-1" /></td>
+    <th class="secondTH">Spotlight Direction4:</th>
+    <td>X: <input type="text" id="directionX4" value="0" /></td>
+    <td>Y: <input type="text" id="directionY4" value="0" /></td>
+    <td>Z: <input type="text" id="directionZ4" value="1" /></td>
+    <th>Ambient Colour:</th>
+    <td>R: <input type="text" id="ambientR" value="0.5" /></td>
+    <td>G: <input type="text" id="ambientG" value="0.5" /></td>
+    <td>B: <input type="text" id="ambientB" value="0.5" /></td>
+    </tr>
+    <tr>
+    <th>Spotlight Params:</th>
+    <td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.1" />
+    &nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.9" /></td>
+    </tr>
+    <tr>
+    <th>Category:</th>
+    <td colspan="7">
+    <form id="categoryChanger">
+    <input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" disabled="disabled" />
+    <input type="submit" value="Go" disabled="disabled" />
+    </form>
+    </td>
+    </tr>
+    </table>
+</div>
 </body>
 
 </html>

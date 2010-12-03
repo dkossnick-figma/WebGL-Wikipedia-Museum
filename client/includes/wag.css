@@ -33,3 +33,10 @@ input[type=text] {
 #categoryInput {
   width: 300px;
 }
+
+#advanced {
+}
+
+#advanced_visibility {
+  color: blue;
+}
