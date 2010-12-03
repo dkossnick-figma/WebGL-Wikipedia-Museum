@@ -13,7 +13,7 @@ var yawRate = 0;
 
 var xPos = 0;
 var yPos = 0.4;
-var zPos = 0;
+var zPos = 1.0;
 
 var speed = 0;
 
@@ -89,6 +89,8 @@ function animate() {
       newXPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
       newZPos = zPos - Math.cos(yaw * piOver180) * speed * elapsed;
 
+      collided = true;
+      
       // collision detection with potential future coords in x-z plane
       if ((inrange(newXPos, -2, 2) && inrange(newZPos, -2, 2))
           || (inrange(newXPos, -0.5, 0.5) && inrange(newZPos, -4, 4))
@@ -97,11 +99,18 @@ function animate() {
           || (inrange(newXPos, -0.5, 3.85) && inrange(newZPos, 3, 4))
           || (inrange(newXPos, -4, -3) && inrange(newZPos, -0.5, 3.85))
           || (inrange(newXPos, 3, 4) && inrange(newZPos, -3.85, 0.5))) {
+        collided = false;
+      }
+      
+      // collision detection with teapot + stand
+      if (Math.abs(newXPos) <= 0.25 && Math.abs(newZPos) <= 0.25) {
+        collided = true;
+      }
+
+      if (!collided) {
         xPos = newXPos;
         zPos = newZPos;
       }
-
-      // TODO: collision detection with other objects in room
 
       joggingAngle += elapsed * 0.6;  // 0.6 "fiddle factor" - makes it feel more realistic :-)
       yPos = Math.sin(joggingAngle * piOver180) / 20 + 0.4;
@@ -127,8 +136,10 @@ function animate() {
         
         // going south
         if (oldXPos < xPos) {
+          //console.log("going north!");
           WAGinstance.onTeleport(WAGConsts.NORTH);
         } else {
+          //console.log("going south!");
           WAGinstance.onTeleport(WAGConsts.SOUTH);
         }
 

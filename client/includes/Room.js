@@ -34,6 +34,60 @@ function Room(loadCompleteCallback) {
     generate: TeapotGenerator,
     textureMap: "textures/teapot.jpg"
   };
+  this.stand = {
+    type: "generator",
+    generate: function() {
+      var ret = [];
+      
+      var v = [[-0.1, 0.25, -0.1], [-0.1, 0.25, 0.1], [0.1, 0.25, 0.1],
+               [0.1, 0.25, -0.1], [-0.1, 0, -0.1], [-0.1, 0, 0.1],
+               [0.1, 0, 0.1], [0.1, 0, -0.1]];
+      var st = [[0, 0], [0, 1], [1, 0], [1, 1], [0, 2.5], [1, 2.5]];
+            
+      // top face
+      ret.push(v[0].concat(st[1]));
+      ret.push(v[1].concat(st[0]));
+      ret.push(v[2].concat(st[2]));
+      ret.push(v[0].concat(st[1]));
+      ret.push(v[3].concat(st[3]));
+      ret.push(v[2].concat(st[2]));
+      
+      // front face
+      ret.push(v[1].concat(st[4]));
+      ret.push(v[5].concat(st[0]));
+      ret.push(v[6].concat(st[2]));
+      ret.push(v[1].concat(st[4]));
+      ret.push(v[2].concat(st[5]));
+      ret.push(v[6].concat(st[2]));
+      
+      // back face
+      ret.push(v[0].concat(st[4]));
+      ret.push(v[4].concat(st[0]));
+      ret.push(v[7].concat(st[2]));
+      ret.push(v[0].concat(st[4]));
+      ret.push(v[3].concat(st[5]));
+      ret.push(v[7].concat(st[2]));
+      
+      // right face
+      ret.push(v[2].concat(st[4]));
+      ret.push(v[6].concat(st[0]));
+      ret.push(v[7].concat(st[2]));
+      ret.push(v[2].concat(st[4]));
+      ret.push(v[3].concat(st[5]));
+      ret.push(v[7].concat(st[2]));
+      
+      // left face
+      ret.push(v[1].concat(st[4]));
+      ret.push(v[5].concat(st[0]));
+      ret.push(v[4].concat(st[2]));
+      ret.push(v[1].concat(st[4]));
+      ret.push(v[0].concat(st[5]));
+      ret.push(v[4].concat(st[2]));
+      
+      return ret;
+    },
+    textureMap: "textures/wallpaper.jpg"
+  };
 
   this.paintingImages = [];
   this.paintingCoords = [
@@ -48,7 +102,7 @@ function Room(loadCompleteCallback) {
   ];
 
   // TODO: Why does the wall have to be last for it to render?
-  this.components = ["ceiling", "floor", "walls", "teapot"];
+  this.components = ["ceiling", "floor", "walls", "teapot", "stand"];
   this.loadedComponents = 0;
   this.hasCompletedLoading = false;
 

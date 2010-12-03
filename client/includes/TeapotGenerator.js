@@ -7,7 +7,7 @@ function TeapotGenerator() {
   };
   
   var transformElement = function(x, i) {
-    var transX = 0, transY = 0.1, transZ = 0;
+    var transX = 0, transY = 0.31, transZ = 0;
     var scale = 0.008, translate = 0;
     switch(i % 3) {
       case 0: translate = transX; break;
