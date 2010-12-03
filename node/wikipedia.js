@@ -31,7 +31,8 @@ function Wikipedia(domain) {
 
   this.normalizePageTitle = function(title) {
     function ucfirst(input) {
-      return input.charAt(0).toUpperCase() + input.slice(1);
+      var string = input.charAt(0).toUpperCase() + input.slice(1);
+      return string.replace(/^\s*|\s*$/g, '');
     }
     var newTitle = title.replace(/^Image:/, "File:").replace(/_/g, " ");
     var spluts = newTitle.split(":", 2);
@@ -101,7 +102,8 @@ function Wikipedia(domain) {
             title_regex = /\[\[((?:[Ii]mage|[Ff]ile):.+?)(?:\||\]\])/,
             jpeg_regex = /\.(jpg|jpeg)/i,
             listof_regex = /^List of (.+)/,
-            image_regex = /^Image:/;
+            image_regex = /^Image:/,
+            blacklist_regex = /^File:Mona Lisa.jpg$/;
 
         for (var page_id in data.query.pages) {
           var page = data.query.pages[page_id];
@@ -128,9 +130,9 @@ function Wikipedia(domain) {
             if (matches) {
               for (var i in matches) {
                 var title_matches = matches[i].match(title_regex);
-                var title = title_matches[1];
-                if (title.match(jpeg_regex)) {
-                  page_stage.image_title = this.normalizePageTitle(title);
+                var title = this.normalizePageTitle(title_matches[1]);
+                if (title.match(jpeg_regex) && !title.match(blacklist_regex)) {
+                  page_stage.image_title = title;
                 }
               }
             }

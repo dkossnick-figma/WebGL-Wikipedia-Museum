@@ -73,18 +73,18 @@ function animate() {
     var elapsed = timeNow - lastTime;
     
     // update moving lights
-        document.getElementById("directionX1").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
-        document.getElementById("directionZ1").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
+    document.getElementById("directionX1").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+    document.getElementById("directionZ1").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
 
-        document.getElementById("directionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
-        document.getElementById("directionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
-        document.getElementById("directionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
-        document.getElementById("lightPositionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
-        document.getElementById("lightPositionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
-        document.getElementById("lightPositionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
-        
-        angle = (angle % 360) + 1;
+    document.getElementById("directionX2").value = Math.max(Math.min(Math.cos(angle *2 * piOver180),1.0),-1.0);
+    document.getElementById("directionY2").value = Math.max(Math.min(Math.sin(angle *2 * piOver180),1.0),-1.0);
+    document.getElementById("directionZ2").value = Math.max(Math.min(Math.cos(angle *2 * piOver180),1.0),-1.0);
+    document.getElementById("lightPositionX2").value = Math.max(Math.min(Math.cos(angle *2 * piOver180),1.0),-1.0);
+    document.getElementById("lightPositionY2").value = Math.max(Math.min(Math.sin(angle *2* piOver180),1.0),-1.0);
+    document.getElementById("lightPositionZ2").value = Math.max(Math.min(Math.cos(angle *2* piOver180),1.0),-1.0);
+    angle = (angle % 360) + 1;
     document.getElementById('debug2').innerHTML = 'angle = ' + angle;
+    
     if (speed != 0) {
       newXPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
       newZPos = zPos - Math.cos(yaw * piOver180) * speed * elapsed;
