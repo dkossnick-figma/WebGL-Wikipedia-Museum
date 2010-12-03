@@ -91,24 +91,36 @@ function animate() {
       joggingAngle += elapsed * 0.6;  // 0.6 "fiddle factor" - makes it feel more realistic :-)
       yPos = Math.sin(joggingAngle * piOver180) / 20 + 0.4;
 
-      // tunnel teleport!!!
-      var buff = 0.1; // prevent users from being stuck at +/-[1.95, 2.0]
-
       // teleport between (1) top/bottom and (2) left/right tunnels
       if (Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0
           && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.0) {
-        zPos *= -1;
-        var displace = (oldXPos < xPos) ? buff : -buff;
-        xPos = -xPos + displace;
-
-        WAGinstance.onTeleport();
+        
+        if (zPos < 0) {
+          zPos = 3 + (zPos + 4);
+        } else {
+          zPos = -3 - (4 - zPos);
+        }        
+        if (xPos < 0) {
+          xPos = 0.5 + (2.5 + xPos);
+        } else {
+          xPos = -0.5 - (2.5 - xPos);
+        }
+        
+        //WAGinstance.onTeleport();
       } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.0
                  && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0) {
-        xPos *= -1;
-        var displace = (oldZPos < zPos) ? buff : -buff;
-        zPos = -zPos + displace;
-
-        WAGinstance.onTeleport();
+        if (xPos < 0) {
+          xPos = 3 + (xPos + 4);
+        } else {
+          xPos = -3 - (4 - xPos);
+        }
+        if (zPos < 0) {
+          zPos = 0.5 + (2.5 + zPos);
+        } else {
+          zPos = -0.5 - (2.5 - zPos);
+        }
+        
+        //WAGinstance.onTeleport();
       }
     }
 
