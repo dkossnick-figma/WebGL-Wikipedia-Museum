@@ -31,7 +31,8 @@ function Wikipedia(domain) {
 
   this.normalizePageTitle = function(title) {
     function ucfirst(input) {
-      return input.charAt(0).toUpperCase() + input.slice(1);
+      var string = input.charAt(0).toUpperCase() + input.slice(1);
+      return string.replace(/^\s*|\s*$/g, '');
     }
     var newTitle = title.replace(/^Image:/, "File:").replace(/_/g, " ");
     var spluts = newTitle.split(":", 2);
