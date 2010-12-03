@@ -80,10 +80,10 @@ function WAG(canvas) {
     if (data.resultCode != 0) {
       alert("Error in retrieving category: " + data.resultCode);
     } else {
-      $('#loadingtext').fadeIn("fast");
+      $('#loadingtext').fadeIn("medium");
       // substring below removes the "category:" at the start of the str
       $('#loadingtext').text("Gallery of " + data.category.substring(9));
-      $('#loadingtext').fadeOut(5000);
+      $('#loadingtext').fadeOut(3000);
     
       // Add the new room to the map
       var oldContinueKey = "";
