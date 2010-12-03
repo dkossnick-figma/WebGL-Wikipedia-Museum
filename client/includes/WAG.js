@@ -1,3 +1,4 @@
+// WAG = "Wikipedia Art Gallery" :)
 function WAG(canvas) {
   this.canvas = document.getElementById(canvas);
 
@@ -79,6 +80,11 @@ function WAG(canvas) {
     if (data.resultCode != 0) {
       alert("Error in retrieving category: " + data.resultCode);
     } else {
+      $('#loadingtext').fadeIn("fast");
+      // substring below removes the "category:" at the start of the str
+      $('#loadingtext').text("Gallery of " + data.category.substring(9));
+      $('#loadingtext').fadeOut(5000);
+    
       // Add the new room to the map
       var oldContinueKey = "";
       if (data.oldContinueKey) {
@@ -98,7 +104,6 @@ function WAG(canvas) {
         this.map[this.prevPointer.key][this.prevPointer.dir] = this.currentRoom;
       }
 
-      $('#loadingtext').hide();
       room.clearPaintings();
       for (var i in data.data) {
         var preload = new Image();
