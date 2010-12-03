@@ -72,6 +72,7 @@ function handleCategoryImages(req, res, data) {
       }
     }
     var result = {
+      category: req.session.curCategory,
       resultCode: WAGConsts.SUCCESS,
       data: data.pages
     };
@@ -91,22 +92,46 @@ app.get("/category/:cat", function(req, res) {
 });
 
 /**
- * Given an active session, returns more images for the given category.
- * If none, returns null.
+ * Called when the Art Gallery first initializes. Chooses an initial gallery in
+ * which to start and returns whatever /category/:cat would return for it.
+ */
+app.get("/start", function(req, res) {
+  var total = catWhitelist.length;
+  var startIndex = Math.floor(Math.random() * catWhitelist.length);
+  req.session.curIndex = startIndex;
+
+  wp.getCategoryImages(catWhitelist[startIndex], null, function(data) {
+    handleCategoryImages(req, res, data);
+  });
+});
+
+/**
+ * Given an active session, returns the next gallery room. That's either more
+ * pics from the current active session or the next category in the whitelist.
  */
 app.get("/more", function(req, res) {
-  if (!req.session.curCategory || !req.session.continueKey) {
+  if (req.session.curCategory) {
+    if (req.session.continueKey) {
+      // Continue with current category
+      wp.getCategoryImages(req.session.curCategory, req.session.continueKey,
+        function(data) {
+          handleCategoryImages(req, res, data);
+        });
+    } else {
+      // Go to next category
+      req.session.curIndex = (req.session.curIndex + 1) % catWhitelist.length;
+      wp.getCategoryImages(catWhitelist[req.session.curIndex], null,
+        function(data) {
+          handleCategoryImages(req, res, data);
+        });
+    }
+  } else {
+    console.error("Client violated protocol: should have called /start first");
     res.send({
-      resultCode: WAGConsts.NO_MORE
+      resultCode: WAGConsts.INVALID_ACTION
     });
     return;
   }
-
-  wp.getCategoryImages(req.session.curCategory, req.session.continueKey,
-    function(data) {
-      handleCategoryImages(req, res, data);
-    }
-  );
 });
 
 app.listen(8900);

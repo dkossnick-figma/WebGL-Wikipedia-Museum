@@ -87,7 +87,10 @@
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
         program.innerAngleUniform = gl.getUniformLocation(program, "uInnerAngle");
         program.outerAngleUniform = gl.getUniformLocation(program, "uOuterAngle");
-        program.pointLightingLocationUniform = gl.getUniformLocation(program, "uPointLightingLocation");
+        program.pointLightingLocationUniform1 = gl.getUniformLocation(program, "uPointLightingLocation1");
+        program.pointLightingLocationUniform2 = gl.getUniformLocation(program, "uPointLightingLocation2");
+        program.pointLightingLocationUniform3 = gl.getUniformLocation(program, "uPointLightingLocation3");
+        program.pointLightingLocationUniform4 = gl.getUniformLocation(program, "uPointLightingLocation4");
         program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
         program.pointLightingDirectionUniform = gl.getUniformLocation(program, "uPointLightingDirection");
 
@@ -134,10 +137,31 @@
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingLocationUniform,
+        currentProgram.pointLightingLocationUniform1,
         parseFloat(document.getElementById("lightPositionX").value),
         parseFloat(document.getElementById("lightPositionY").value),
         parseFloat(document.getElementById("lightPositionZ").value)
+      );
+
+      gl.uniform3f(
+        currentProgram.pointLightingLocationUniform2,
+        -parseFloat(document.getElementById("lightPositionX").value),
+        parseFloat(document.getElementById("lightPositionY").value),
+        parseFloat(document.getElementById("lightPositionZ").value)
+      );
+
+      gl.uniform3f(
+        currentProgram.pointLightingLocationUniform3,
+        parseFloat(document.getElementById("lightPositionX").value),
+        parseFloat(document.getElementById("lightPositionY").value),
+        -parseFloat(document.getElementById("lightPositionZ").value)
+      );
+
+      gl.uniform3f(
+        currentProgram.pointLightingLocationUniform4,
+        -parseFloat(document.getElementById("lightPositionX").value),
+        parseFloat(document.getElementById("lightPositionY").value),
+        -parseFloat(document.getElementById("lightPositionZ").value)
       );
 
       gl.uniform3f(
@@ -198,6 +222,8 @@ Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page D
 look up and down.<br/>
   <br/>
 
+<div id="debug"></div>
+  
 <label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
 <label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
 <label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
