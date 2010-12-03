@@ -48,6 +48,7 @@ function handleCategoryImages(req, res, data) {
   }
 
   // Store current parameters in session
+  var oldContinueKey = req.session.continueKey;
   req.session.curCategory = data.title;
   req.session.continueKey = data.continuekey;
 
@@ -73,6 +74,7 @@ function handleCategoryImages(req, res, data) {
     }
     var result = {
       category: req.session.curCategory,
+      oldContinueKey: oldContinueKey,
       resultCode: WAGConsts.SUCCESS,
       data: data.pages
     };
@@ -82,11 +84,10 @@ function handleCategoryImages(req, res, data) {
 }
 
 /**
- * Given a category, sets the active category in the session and returns the
- * first set of images for it.
+ * Given a category and a continue key, returns data for that exact resultset.
  */
-app.get("/category/:cat", function(req, res) {
-  wp.getCategoryImages(req.params.cat, null, function(data) {
+app.get("/category/:cat/:ckey?", function(req, res) {
+  wp.getCategoryImages(req.params.cat, req.params.ckey, function(data) {
     handleCategoryImages(req, res, data);
   });
 });

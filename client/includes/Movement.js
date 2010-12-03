@@ -94,19 +94,20 @@ function animate() {
       // teleport between (1) top/bottom and (2) left/right tunnels
       if (Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0
           && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.0) {
-        
+
         if (zPos < 0) {
           zPos = 3 + (zPos + 4);
         } else {
           zPos = -3 - (4 - zPos);
-        }        
+        }
         if (xPos < 0) {
           xPos = 0.5 + (2.5 + xPos);
         } else {
           xPos = -0.5 - (2.5 - xPos);
         }
-        
-        //WAGinstance.onTeleport();
+
+        // TODO: Send the actual direction
+        WAGinstance.onTeleport(WAGConsts.NORTH);
       } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.0
                  && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0) {
         if (xPos < 0) {
@@ -119,8 +120,9 @@ function animate() {
         } else {
           zPos = -0.5 - (2.5 - zPos);
         }
-        
-        //WAGinstance.onTeleport();
+
+        // TODO: Send the actual direction
+        WAGinstance.onTeleport(WAGConsts.SOUTH);
       }
     }
 
