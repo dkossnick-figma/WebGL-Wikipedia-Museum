@@ -102,6 +102,18 @@ function WAG(canvas) {
       // Set the pointer at the old room
       if (this.prevPointer.key) {
         this.map[this.prevPointer.key][this.prevPointer.dir] = this.currentRoom;
+        
+        // add history to current room
+        var oppositeDir;        
+        switch (this.prevPointer.dir) {
+          case WAGConsts.NORTH: oppositeDir = WAGConsts.SOUTH; break;
+          case WAGConsts.SOUTH: oppositeDir = WAGConsts.NORTH; break;
+          case WAGConsts.EAST:  oppositeDir = WAGConsts.WEST;  break;
+          case WAGConsts.WEST:  oppositeDir = WAGConsts.EAST;  break;
+        }
+        
+        // TODO: this is working only on client side
+        this.map[this.currentRoom][oppositeDir] = this.prevPointer.key;
       }
 
       room.clearPaintings();
