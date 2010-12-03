@@ -226,6 +226,11 @@
   }
 
   $(document).ready(function() {
+    canvas = document.getElementById("wagCanvas");
+    canvas.width = document.width;
+    // for some reason height, below, doesn't seem to work.
+    canvas.height = getDocHeight() - 30;
+
     room = new Room(function() {
       $('#loadingtext').hide();
 -      WAGinstance.startFetch();
@@ -234,11 +239,20 @@
     WAGinstance = new WAG("wagCanvas");
     WAGinstance.initialize();
   });
+  
+  function getDocHeight() {
+    var D = document;
+    return Math.max(
+        Math.max(D.body.scrollHeight, D.documentElement.scrollHeight),
+        Math.max(D.body.offsetHeight, D.documentElement.offsetHeight),
+        Math.max(D.body.clientHeight, D.documentElement.clientHeight)
+    );
+}
 </script>
 </head>
 
 <body>
-  <canvas id="wagCanvas" style="border: none;" width="800" height="500"></canvas>
+  <canvas id="wagCanvas" style="border: none;" width="900" height="650"></canvas>
  
   <div id="loadingtext">Loading...</div>
 
