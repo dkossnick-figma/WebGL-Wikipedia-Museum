@@ -8,7 +8,7 @@ var WAGConsts = {
   SUCCESS       :  0,
   UNKNOWN       :  1,
   EMPTY_CATEGORY:  2,
-  NO_MORE       :  3
+  INVALID_ACTION:  3
 };
 
 if (typeof exports != "undefined") {
