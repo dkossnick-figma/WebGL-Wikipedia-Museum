@@ -64,11 +64,12 @@ function handleCategoryImages(req, res, data) {
   // Now get thumbs for each of the images
   wp.getImageThumbs(images, 300, function(thumbdata) {
     for (var i in data.pages) {
-      var image_title = data.pages[i].image_title;
+      var image_title = wp.normalizePageTitle(data.pages[i].image_title);
       if (thumbdata[image_title]) {
         data.pages[i].thumb_url = thumbdata[image_title];
       } else {
-        console.error("CONSISTENCY: Did not retrieve thumb for "+image_title);
+        console.error("CONSISTENCY: Did not retrieve thumb for [[" +
+          image_title + "]]");
         console.log(thumbdata);
         //sendWrappedError(res, WAGConsts.UNKNOWN,
         //  "WAGinstance.handleCategoryImages");
