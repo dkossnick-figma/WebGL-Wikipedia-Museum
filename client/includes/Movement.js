@@ -107,18 +107,36 @@ function animate() {
       // teleport between (1) top/bottom and (2) left/right tunnels
       // checks if in zone, and if traveling out of room. (if incoming, won't tp)
       if (Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0
-          && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.0
-         ) {
-        zPos *= -1;
-        var displace = (oldXPos < xPos) ? buff : -buff;
-        xPos = -xPos;// + displace;
+          && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.0) {
 
+        if (zPos < 0) {
+          zPos = 3 + (zPos + 4);
+        } else {
+          zPos = -3 - (4 - zPos);
+        }
+        if (xPos < 0) {
+          xPos = 0.5 + (2.5 + xPos);
+        } else {
+          xPos = -0.5 - (2.5 - xPos);
+        }
+
+        // TODO: Send the actual direction
+        WAGinstance.onTeleport(WAGConsts.NORTH);
       } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.0
-                 && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0
-                 ) {
-        xPos *= -1;
-        var displace = (oldZPos < zPos) ? buff : -buff;
-        zPos = -zPos;// + displace;
+                 && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0) {
+        if (xPos < 0) {
+          xPos = 3 + (xPos + 4);
+        } else {
+          xPos = -3 - (4 - xPos);
+        }
+        if (zPos < 0) {
+          zPos = 0.5 + (2.5 + zPos);
+        } else {
+          zPos = -0.5 - (2.5 - zPos);
+        }
+
+        // TODO: Send the actual direction
+        WAGinstance.onTeleport(WAGConsts.SOUTH);
       }
     }
 

@@ -42,12 +42,17 @@ function sendWrappedError(res, errorCode, responseFunc) {
 
 function handleCategoryImages(req, res, data) {
   if (data.pages.length == 0) {
-    sendWrappedError(res, WAGConsts.EMPTY_CATEGORY,
-      "WAGinstance.handleCategoryImages");
+    //sendWrappedError(res, WAGConsts.EMPTY_CATEGORY,
+    //  "WAGinstance.handleCategoryImages");
+    console.log(data.title + " was empty, skipping");
+    req.session.curCategory = data.title;
+    req.session.continueKey = "";
+    appFuncMore(req, res);
     return;
   }
 
   // Store current parameters in session
+  var oldContinueKey = req.session.continueKey;
   req.session.curCategory = data.title;
   req.session.continueKey = data.continuekey;
 
@@ -73,6 +78,7 @@ function handleCategoryImages(req, res, data) {
     }
     var result = {
       category: req.session.curCategory,
+      oldContinueKey: oldContinueKey,
       resultCode: WAGConsts.SUCCESS,
       data: data.pages
     };
@@ -82,11 +88,10 @@ function handleCategoryImages(req, res, data) {
 }
 
 /**
- * Given a category, sets the active category in the session and returns the
- * first set of images for it.
+ * Given a category and a continue key, returns data for that exact resultset.
  */
-app.get("/category/:cat", function(req, res) {
-  wp.getCategoryImages(req.params.cat, null, function(data) {
+app.get("/category/:cat/:ckey?", function(req, res) {
+  wp.getCategoryImages(req.params.cat, req.params.ckey, function(data) {
     handleCategoryImages(req, res, data);
   });
 });
@@ -109,7 +114,7 @@ app.get("/start", function(req, res) {
  * Given an active session, returns the next gallery room. That's either more
  * pics from the current active session or the next category in the whitelist.
  */
-app.get("/more", function(req, res) {
+var appFuncMore = function(req, res) {
   if (req.session.curCategory) {
     if (req.session.continueKey) {
       // Continue with current category
@@ -132,7 +137,8 @@ app.get("/more", function(req, res) {
     });
     return;
   }
-});
+}
+app.get("/more", appFuncMore);
 
 app.listen(8900);
 console.log("Server running");

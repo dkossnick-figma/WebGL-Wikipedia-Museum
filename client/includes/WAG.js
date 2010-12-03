@@ -15,6 +15,13 @@ function WAG(canvas) {
     }
   };
 
+  this.map = {};
+  this.currentRoom = null;
+  this.prevPointer = {
+    key: null,
+    dir: null
+  };
+
   this.initialize = function() {
     try {
       gl = this.canvas.getContext("experimental-webgl");
@@ -72,6 +79,25 @@ function WAG(canvas) {
     if (data.resultCode != 0) {
       alert("Error in retrieving category: " + data.resultCode);
     } else {
+      // Add the new room to the map
+      var oldContinueKey = "";
+      if (data.oldContinueKey) {
+        oldContinueKey = data.oldContinueKey;
+      }
+      this.currentRoom = data.category + "|" + oldContinueKey;
+      if (!this.map[this.currentRoom]) {
+        this.map[this.currentRoom] = {
+          N: null,
+          E: null,
+          S: null,
+          W: null
+        };
+      }
+      // Set the pointer at the old room
+      if (this.prevPointer.key) {
+        this.map[this.prevPointer.key][this.prevPointer.dir] = this.currentRoom;
+      }
+
       $('#loadingtext').hide();
       room.clearPaintings();
       for (var i in data.data) {
@@ -88,23 +114,45 @@ function WAG(canvas) {
     }
   }
 
+  /**
+   * Fakes an Ajax request to the node. segment should already be
+   * appropriately urlencoded.
+   */
+  this._fakeAjax = function(segment) {
+    // Since the node is on a different domain, we can't use Ajax.
+    $('head').append('<script type="text/javascript" '+
+      'src="http://node.art.kimbei.com/' + segment +
+      '"></script>');
+  }
+
   this.changeCategory = function() {
     var category = $('#categoryInput').val();
 
     $('#loadingtext').show();
 
     // Since the node is on a different domain, we can't use Ajax.
-    $('head').append('<script type="text/javascript" '+
-      'src="http://node.art.kimbei.com/category/'+encodeURI(category)+
-      '"></script>');
+    this._fakeAjax('category/' + encodeURI(category));
 
     return false;
   }
 
-  this.onTeleport = function() {
-    $(this.canvas).fadeOut(300, function() {
-      $(this.canvas).fadeIn(300);
-    }.bind(this));
+  /**
+   * Calls the initial fetch from the node.
+   */
+  this.startFetch = function() {
+    this._fakeAjax('start');
+  }
+
+  this.onTeleport = function(direction) {
+    this.prevPointer.key = this.currentRoom;
+    this.prevPointer.dir = direction;
+
+    if (this.map[this.currentRoom][direction]) {
+      var goTo = this.map[this.currentRoom][direction].split("|");
+      this._fakeAjax('category/' + goTo[0] + "/" + goTo[1]);
+    } else {
+      this._fakeAjax('more');
+    }
   }
 
 }

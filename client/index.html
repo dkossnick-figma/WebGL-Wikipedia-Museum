@@ -15,6 +15,7 @@
 <script type="text/javascript" src="includes/Matrix.js"></script>
 <script type="text/javascript" src="includes/Movement.js"></script>
 <script type="text/javascript" src="includes/WAG.js"></script>
+<script type="text/javascript" src="../shared/WAGConsts.js"></script>
 
 <script type="text/javascript">
   var WAGinstance;
@@ -227,6 +228,8 @@
   $(document).ready(function() {
     room = new Room(function() {
       $('#loadingtext').hide();
+
+      WAGinstance.startFetch();
     });
 
     WAGinstance = new WAG("wagCanvas");
@@ -308,8 +311,8 @@ look up and down.<br/>
 <th>Category:</th>
 <td colspan="7">
 <form id="categoryChanger">
-<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" />
-<input type="submit" value="Go" />
+<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" disabled="disabled" />
+<input type="submit" value="Go" disabled="disabled" />
 </form>
 </td>
 </tr>

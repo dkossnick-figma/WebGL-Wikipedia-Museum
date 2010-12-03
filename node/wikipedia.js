@@ -30,7 +30,12 @@ function Wikipedia(domain) {
   }
 
   this.normalizePageTitle = function(title) {
-    return title.replace(/^Image:/, "File:").replace(/_/g, " ");
+    function ucfirst(input) {
+      return input.charAt(0).toUpperCase() + input.slice(1);
+    }
+    var newTitle = title.replace(/^Image:/, "File:").replace(/_/g, " ");
+    var spluts = newTitle.split(":", 2);
+    return ucfirst(spluts[0]) + ":" + ucfirst(spluts[1]);
   }
 
   //
