@@ -105,9 +105,14 @@ function animate() {
         } else {
           xPos = -0.5 - (2.5 - xPos);
         }
+        
+        // going south
+        if (oldXPos < xPos) {
+          WAGinstance.onTeleport(WAGConsts.NORTH);
+        } else {
+          WAGinstance.onTeleport(WAGConsts.SOUTH);
+        }
 
-        // TODO: Send the actual direction
-        WAGinstance.onTeleport(WAGConsts.NORTH);
       } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.4
                  && Math.abs(xPos) >= 3.0 && Math.abs(xPos) <= 4.0) {
         if (xPos < 0) {
@@ -121,8 +126,11 @@ function animate() {
           zPos = -0.5 - (2.5 - zPos);
         }
 
-        // TODO: Send the actual direction
-        WAGinstance.onTeleport(WAGConsts.SOUTH);
+        if (oldZPos < zPos) {
+          WAGinstance.onTeleport(WAGConsts.WEST);
+        } else {
+          WAGinstance.onTeleport(WAGConsts.EAST);
+        }
       }
     }
 
