@@ -15,7 +15,6 @@
 <script type="text/javascript" src="includes/Matrix.js"></script>
 <script type="text/javascript" src="includes/Movement.js"></script>
 <script type="text/javascript" src="includes/WAG.js"></script>
-<script type="text/javascript" src="../shared/WAGConsts.js"></script>
 
 <script type="text/javascript">
   var WAGinstance;
@@ -228,8 +227,6 @@
   $(document).ready(function() {
     room = new Room(function() {
       $('#loadingtext').hide();
-
-      WAGinstance.startFetch();
     });
 
     WAGinstance = new WAG("wagCanvas");
@@ -276,9 +273,9 @@ look up and down.<br/>
 <td>Y: <input type="text" id="lightPositionY4" value="0.5" /></td>
 <td>Z: <input type="text" id="lightPositionZ4" value="1.4" /></td>
 <th class="secondTH">Colour:</th>
-<td>R: <input type="text" id="pointR" value="0.6" /></td>
-<td>G: <input type="text" id="pointG" value="0.6" /></td>
-<td>B: <input type="text" id="pointB" value="0.6" /></td>
+<td>R: <input type="text" id="pointR" value="0.3" /></td>
+<td>G: <input type="text" id="pointG" value="0.3" /></td>
+<td>B: <input type="text" id="pointB" value="0.3" /></td>
 </tr>
 <tr>
 <th>Ambient Colour:</th>
@@ -287,7 +284,7 @@ look up and down.<br/>
 <td>B: <input type="text" id="ambientB" value="0.5" /></td>
 <th class="secondTH">Spotlight Direction1:</th>
 <td>X: <input type="text" id="directionX1" value="0" /></td>
-<td>Y: <input type="text" id="directionY1" value="0.5" /></td>
+<td>Y: <input type="text" id="directionY1" value="0.4" /></td>
 <td>Z: <input type="text" id="directionZ1" value="0" /></td>
 <th class="secondTH">Spotlight Direction2:</th>
 <td>X: <input type="text" id="directionX2" value="1" /></td>
@@ -311,8 +308,8 @@ look up and down.<br/>
 <th>Category:</th>
 <td colspan="7">
 <form id="categoryChanger">
-<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" disabled="disabled" />
-<input type="submit" value="Go" disabled="disabled" />
+<input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" />
+<input type="submit" value="Go" />
 </form>
 </td>
 </tr>

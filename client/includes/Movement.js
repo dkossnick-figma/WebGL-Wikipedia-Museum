@@ -75,9 +75,14 @@ function animate() {
     // update moving lights
         document.getElementById("directionX1").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
         document.getElementById("directionZ1").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
+
         document.getElementById("directionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
         document.getElementById("directionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
         document.getElementById("directionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        
         angle = (angle % 360) + 2;
     document.getElementById('debug2').innerHTML = 'angle = ' + angle;
     if (speed != 0) {
