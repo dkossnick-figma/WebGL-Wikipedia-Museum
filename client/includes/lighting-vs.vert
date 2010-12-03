@@ -30,3 +30,4 @@ void main(void) {
   vTextureCoord = aTextureCoord;
   vTransformedNormal = vec4(aVertexNormal, 1.0);
 }
+

@@ -21,6 +21,7 @@ var lastTime = 0;
 var piOver180 = Math.PI / 180;
 var joggingAngle = 0;
 
+var angle = 0;
 
 function handleKeyDown(event) {
   currentlyPressedKeys[event.keyCode] = true;
@@ -64,12 +65,26 @@ function handleKeys() {
 }
 
 function animate() {
+  document.getElementById("debug").innerHTML = "X=" + xPos + ", Y=" + yPos + ", Z=" + zPos;
   var timeNow = new Date().getTime();
   var newZPos = zPos, oldZPos = zPos;
   var newXPos = xPos, oldXPos = xPos;
   if (lastTime != 0) {
     var elapsed = timeNow - lastTime;
+    
+    // update moving lights
+        document.getElementById("directionX1").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("directionZ1").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
 
+        document.getElementById("directionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("directionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
+        document.getElementById("directionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionX2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
+        document.getElementById("lightPositionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
+        
+        angle = (angle % 360) + 1;
+    document.getElementById('debug2').innerHTML = 'angle = ' + angle;
     if (speed != 0) {
       newXPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
       newZPos = zPos - Math.cos(yaw * piOver180) * speed * elapsed;
@@ -90,8 +105,12 @@ function animate() {
 
       joggingAngle += elapsed * 0.6;  // 0.6 "fiddle factor" - makes it feel more realistic :-)
       yPos = Math.sin(joggingAngle * piOver180) / 20 + 0.4;
+  
+      // tunnel teleport!!!
+      var buff = 0.1; // prevent users from being stuck at +/-[1.95, 2.0]
 
       // teleport between (1) top/bottom and (2) left/right tunnels
+      // checks if in zone, and if traveling out of room. (if incoming, won't tp)
       if (Math.abs(zPos) >= 3.0 && Math.abs(zPos) <= 4.0
           && Math.abs(xPos) >= 1.9 && Math.abs(xPos) <= 2.4) {
 

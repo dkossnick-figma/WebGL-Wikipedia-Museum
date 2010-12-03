@@ -88,12 +88,15 @@
         program.ambientColorUniform = gl.getUniformLocation(program, "uAmbientColor");
         program.innerAngleUniform = gl.getUniformLocation(program, "uInnerAngle");
         program.outerAngleUniform = gl.getUniformLocation(program, "uOuterAngle");
-        program.pointLightingLocationUniform1 = gl.getUniformLocation(program, "uPointLightingLocation1");
-        program.pointLightingLocationUniform2 = gl.getUniformLocation(program, "uPointLightingLocation2");
-        program.pointLightingLocationUniform3 = gl.getUniformLocation(program, "uPointLightingLocation3");
-        program.pointLightingLocationUniform4 = gl.getUniformLocation(program, "uPointLightingLocation4");
+        program.pointLightingLocation1Uniform = gl.getUniformLocation(program, "uPointLightingLocation1");
+        program.pointLightingLocation2Uniform = gl.getUniformLocation(program, "uPointLightingLocation2");
+        program.pointLightingLocation3Uniform = gl.getUniformLocation(program, "uPointLightingLocation3");
+        program.pointLightingLocation4Uniform = gl.getUniformLocation(program, "uPointLightingLocation4");
         program.pointLightingColorUniform = gl.getUniformLocation(program, "uPointLightingColor");
-        program.pointLightingDirectionUniform = gl.getUniformLocation(program, "uPointLightingDirection");
+        program.spotlightDirection1Uniform = gl.getUniformLocation(program, "uSpotlightDirection1");
+        program.spotlightDirection2Uniform = gl.getUniformLocation(program, "uSpotlightDirection2");
+        program.spotlightDirection3Uniform = gl.getUniformLocation(program, "uSpotlightDirection3");
+        program.spotlightDirection4Uniform = gl.getUniformLocation(program, "uSpotlightDirection4");
 
         cb(program);
       });
@@ -138,31 +141,31 @@
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingLocationUniform1,
-        parseFloat(document.getElementById("lightPositionX").value),
-        parseFloat(document.getElementById("lightPositionY").value),
-        parseFloat(document.getElementById("lightPositionZ").value)
+        currentProgram.pointLightingLocation1Uniform,
+        parseFloat(document.getElementById("lightPositionX1").value),
+        parseFloat(document.getElementById("lightPositionY1").value),
+        parseFloat(document.getElementById("lightPositionZ1").value)
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingLocationUniform2,
-        -parseFloat(document.getElementById("lightPositionX").value),
-        parseFloat(document.getElementById("lightPositionY").value),
-        parseFloat(document.getElementById("lightPositionZ").value)
+        currentProgram.pointLightingLocation2Uniform,
+        parseFloat(document.getElementById("lightPositionX2").value),
+        parseFloat(document.getElementById("lightPositionY2").value),
+        parseFloat(document.getElementById("lightPositionZ2").value)
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingLocationUniform3,
-        parseFloat(document.getElementById("lightPositionX").value),
-        parseFloat(document.getElementById("lightPositionY").value),
-        -parseFloat(document.getElementById("lightPositionZ").value)
+        currentProgram.pointLightingLocation3Uniform,
+        parseFloat(document.getElementById("lightPositionX3").value),
+        parseFloat(document.getElementById("lightPositionY3").value),
+        parseFloat(document.getElementById("lightPositionZ3").value)
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingLocationUniform4,
-        -parseFloat(document.getElementById("lightPositionX").value),
-        parseFloat(document.getElementById("lightPositionY").value),
-        -parseFloat(document.getElementById("lightPositionZ").value)
+        currentProgram.pointLightingLocation4Uniform,
+        parseFloat(document.getElementById("lightPositionX4").value),
+        parseFloat(document.getElementById("lightPositionY4").value),
+        parseFloat(document.getElementById("lightPositionZ4").value)
       );
 
       gl.uniform3f(
@@ -173,12 +176,32 @@
       );
 
       gl.uniform3f(
-        currentProgram.pointLightingDirectionUniform,
-        parseFloat(document.getElementById("directionX").value),
-        parseFloat(document.getElementById("directionY").value),
-        parseFloat(document.getElementById("directionZ").value)
+        currentProgram.spotlightDirection1Uniform,
+        parseFloat(document.getElementById("directionX1").value),
+        parseFloat(document.getElementById("directionY1").value),
+        parseFloat(document.getElementById("directionZ1").value)
       );
-
+      
+      gl.uniform3f(
+        currentProgram.spotlightDirection2Uniform,
+        parseFloat(document.getElementById("directionX2").value),
+        parseFloat(document.getElementById("directionY2").value),
+        parseFloat(document.getElementById("directionZ2").value)
+      );
+      
+      gl.uniform3f(
+        currentProgram.spotlightDirection3Uniform,
+        parseFloat(document.getElementById("directionX3").value),
+        parseFloat(document.getElementById("directionY3").value),
+        parseFloat(document.getElementById("directionZ3").value)
+      );
+      
+      gl.uniform3f(
+        currentProgram.spotlightDirection4Uniform,
+        parseFloat(document.getElementById("directionX4").value),
+        parseFloat(document.getElementById("directionY4").value),
+        parseFloat(document.getElementById("directionZ4").value)
+      );
       gl.uniform1f(
         currentProgram.innerAngleUniform,
         parseFloat(document.getElementById("inner_angle").value)
@@ -205,8 +228,7 @@
   $(document).ready(function() {
     room = new Room(function() {
       $('#loadingtext').hide();
-
-      WAGinstance.startFetch();
+-      WAGinstance.startFetch();
     });
 
     WAGinstance = new WAG("wagCanvas");
@@ -226,6 +248,7 @@ look up and down.<br/>
   <br/>
 
 <div id="debug"></div>
+<div id="debug2"></div>
   
 <label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
 <label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
@@ -235,29 +258,53 @@ look up and down.<br/>
 
 <table id="parameterTable">
 <tr>
-<th>Position:</th>
-<td>X: <input type="text" id="lightPositionX" value="-1.5" /></td>
-<td>Y: <input type="text" id="lightPositionY" value="0.5" /></td>
-<td>Z: <input type="text" id="lightPositionZ" value="-1.5" /></td>
+<th>Position1:</th>
+<td>X: <input type="text" id="lightPositionX1" value="0" /></td>
+<td>Y: <input type="text" id="lightPositionY1" value="0.5" /></td>
+<td>Z: <input type="text" id="lightPositionZ1" value="0" /></td>
+<th>Position2:</th>
+<td>X: <input type="text" id="lightPositionX2" value="-1.5" /></td>
+<td>Y: <input type="text" id="lightPositionY2" value="0.5" /></td>
+<td>Z: <input type="text" id="lightPositionZ2" value="-1.5" /></td>
+<th>Position3:</th>
+<td>X: <input type="text" id="lightPositionX3" value="1.0" /></td>
+<td>Y: <input type="text" id="lightPositionY3" value="0.5" /></td>
+<td>Z: <input type="text" id="lightPositionZ3" value="-1.5" /></td>
+<th>Position4:</th>
+<td>X: <input type="text" id="lightPositionX4" value="0.7" /></td>
+<td>Y: <input type="text" id="lightPositionY4" value="0.5" /></td>
+<td>Z: <input type="text" id="lightPositionZ4" value="1.4" /></td>
 <th class="secondTH">Colour:</th>
-<td>R: <input type="text" id="pointR" value="0.6" /></td>
-<td>G: <input type="text" id="pointG" value="0.6" /></td>
-<td>B: <input type="text" id="pointB" value="0.6" /></td>
+<td>R: <input type="text" id="pointR" value="0.5" /></td>
+<td>G: <input type="text" id="pointG" value="0.5" /></td>
+<td>B: <input type="text" id="pointB" value="0.5" /></td>
 </tr>
 <tr>
 <th>Ambient Colour:</th>
 <td>R: <input type="text" id="ambientR" value="0.5" /></td>
 <td>G: <input type="text" id="ambientG" value="0.5" /></td>
 <td>B: <input type="text" id="ambientB" value="0.5" /></td>
-<th class="secondTH">Spotlight Direction:</th>
-<td>X: <input type="text" id="directionX" value="0" /></td>
-<td>Y: <input type="text" id="directionY" value="0" /></td>
-<td>Z: <input type="text" id="directionZ" value="1" /></td>
+<th class="secondTH">Spotlight Direction1:</th>
+<td>X: <input type="text" id="directionX1" value="0" /></td>
+<td>Y: <input type="text" id="directionY1" value="0.4" /></td>
+<td>Z: <input type="text" id="directionZ1" value="0" /></td>
+<th class="secondTH">Spotlight Direction2:</th>
+<td>X: <input type="text" id="directionX2" value="1" /></td>
+<td>Y: <input type="text" id="directionY2" value=".5" /></td>
+<td>Z: <input type="text" id="directionZ2" value="1" /></td>
+<th class="secondTH">Spotlight Direction3:</th>
+<td>X: <input type="text" id="directionX3" value="0" /></td>
+<td>Y: <input type="text" id="directionY3" value="0.3" /></td>
+<td>Z: <input type="text" id="directionZ3" value="-1" /></td>
+<th class="secondTH">Spotlight Direction4:</th>
+<td>X: <input type="text" id="directionX4" value="0" /></td>
+<td>Y: <input type="text" id="directionY4" value="0" /></td>
+<td>Z: <input type="text" id="directionZ4" value="1" /></td>
 </tr>
 <tr>
 <th>Spotlight Params:</th>
-<td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.6" />
-&nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.7" /></td>
+<td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.1" />
+&nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.9" /></td>
 </tr>
 <tr>
 <th>Category:</th>

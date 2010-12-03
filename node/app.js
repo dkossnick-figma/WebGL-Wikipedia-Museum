@@ -42,8 +42,12 @@ function sendWrappedError(res, errorCode, responseFunc) {
 
 function handleCategoryImages(req, res, data) {
   if (data.pages.length == 0) {
-    sendWrappedError(res, WAGConsts.EMPTY_CATEGORY,
-      "WAGinstance.handleCategoryImages");
+    //sendWrappedError(res, WAGConsts.EMPTY_CATEGORY,
+    //  "WAGinstance.handleCategoryImages");
+    console.log(data.title + " was empty, skipping");
+    req.session.curCategory = data.title;
+    req.session.continueKey = "";
+    appFuncMore(req, res);
     return;
   }
 
@@ -110,7 +114,7 @@ app.get("/start", function(req, res) {
  * Given an active session, returns the next gallery room. That's either more
  * pics from the current active session or the next category in the whitelist.
  */
-app.get("/more", function(req, res) {
+var appFuncMore = function(req, res) {
   if (req.session.curCategory) {
     if (req.session.continueKey) {
       // Continue with current category
@@ -133,7 +137,8 @@ app.get("/more", function(req, res) {
     });
     return;
   }
-});
+}
+app.get("/more", appFuncMore);
 
 app.listen(8900);
 console.log("Server running");
