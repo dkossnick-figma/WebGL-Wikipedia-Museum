@@ -83,7 +83,7 @@ function animate() {
         document.getElementById("lightPositionY2").value = Math.max(Math.min(Math.sin(angle * piOver180),1.0),-1.0);
         document.getElementById("lightPositionZ2").value = Math.max(Math.min(Math.cos(angle * piOver180),1.0),-1.0);
         
-        angle = (angle % 360) + 2;
+        angle = (angle % 360) + 1;
     document.getElementById('debug2').innerHTML = 'angle = ' + angle;
     if (speed != 0) {
       newXPos = xPos - Math.sin(yaw * piOver180) * speed * elapsed;
