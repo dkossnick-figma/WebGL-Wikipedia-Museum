@@ -1,7 +1,136 @@
-This is a WebGL-based 3d application that allows you to navigate around a virtual museum filled with artwork from Wikipedia.
+README
 
-Some of the source code was based on lessons from www.learningwebgl.com/lessons. Many thanks!
+CS175 Final Project
 
-Server
-------
-WAG's backend is written in node.js. It requires the "async" module (available through npm) and the "restler" module (check out from https://github.com/danwrong/restler).
+TITLE:   Wikipedia Art Gallery (in WebGL)
+
+ADVISER: Yuanchen Zhu
+
+MEMBERS: David Kosslyn     dkosslyn@fas.harvard.edu
+         Keito Uchiyama    keito@cs.harvard.edu
+         Yuhki Yamashita   yyamash@fas.harvard.edu
+
+-----------------------------------------------------------------------------
+DESCRIPTION:
+
+Our project implements a 3D art gallery in WebGL.  The gallery is powered by
+Wikipedia's corpus, displaying images according to their categories.  Users
+can either specify a particular category of paintings they would like to see
+or browse randomly through the different galleries in the museum.
+
+-----------------------------------------------------------------------------
+SOURCE CODE & FILES:
+
+README.txt
+
+client/
+ \_ waglogo.png (logo)
+ \_ index.html (main page)
+ \_ includes/
+     \_ WorldGenerator.js (generates geometry of walls)
+     \_ WAG.js (creates connection with Wikipedia backend)
+     \_ wag.css
+     \_ TeapotGenerator.js (generates vertices, normals for teapot)
+     \_ sylvester.js (implements some matrix operations, provided by Thomas)
+     \_ spotlight-vs.vert (spotlight vertex shader)
+     \_ spotlight-fs.frag (spotlight fragment shader)
+     \_ shader-vs.vert (per-fragment vertex shader)
+     \_ shader-fs.frag (per-fragment fragment shader)
+     \_ Room.js (functions pertaining to art gallery generation)
+     \_ Movement.js (functions for moving / teleporting)
+     \_ Matrix.js (implements basic matrix operations, provided by Thomas)
+     \_ lighting-vs.vert (per-vertex vertex shader)
+     \_ lighting-fs.frag (per-vertex fragment shader)
+     \_ glUtils.js (WebGL functions, provided by Thomas)
+     
+ \_ textures/
+     \_ wallpaper.jpg
+     \_ teapot.jpg
+     \_ plank.jpg
+     \_ PROVENANCE.txt (provenance of texture files)
+
+node/
+ \_ app.js (allows for browsing within art gallery)
+ \_ catwhitelist.list (list of valid categories in Wikipedia)
+ \_ genwhitelist.js (generates above list)
+ \_ wikipedia.js (implements Wikipedia interface)
+
+shared/
+ \_ WAGConsts.js (setup file)
+
+-----------------------------------------------------------------------------
+ACKNOWLEDGEMENTS:
+
+We would like to thank Giles Thomas, who provided many useful tutorials
+online on WebGL.  Much of our framework is based on his work (WebGL versions
+of the NeHe OpenGL tutorials):
+
+http://learningwebgl.com/blog/?page_id=1217
+
+We also borrowed heavily from the CS175 problem sets and lecture slides.
+
+All displayed images (i.e. paintings) are taken from Wikipedia, unless
+otherwise indicated.
+
+-----------------------------------------------------------------------------
+VIEWING/INSTALLING:
+
+1. Make sure you have a browser installed that supports WebGL.  We developed
+   on Firefox 4.0b7, so we recommend you install this version.
+
+2. Make sure that your browser has WebGL enabled.  See detailed instructions
+   here:
+   
+   http://www.windows7hacker.com/index.php/2010/02/how-to-enable-webgl-in-
+   firefox-chrome-and-safari/
+
+3. Visit one of the following links (they should all work):
+   - https://cloud.cs50.net/~yyamash/cs175/WebGL-Wikipedia-Museum/client/
+   - http://davidkosslyn.com/cs175/WebGL-Wikipedia-Museum/client/
+   - http://art.kimbei.com/WebGL-Wikipedia-Museum/client/
+
+4. You're done!
+
+You may also choose to download the source files yourself.  These are
+available in the zip file but also open source at this link:
+
+https://github.com/kozzles/WebGL-Wikipedia-Museum
+
+Note that the backend is written in node.js.  It requires the "async" module
+(available through npm) and the "restler" module (check out from
+https://github.com/danwrong/restler).
+
+-----------------------------------------------------------------------------
+A BRIEF USER'S GUIDE:
+
+Once at you're at the website, you can immediately begin navigating with the
+arrow keys and Page Up/Down keys.  The up and down arrows move forward and
+backward; the right/left arrows yaw, and the Page Up/Down keys pitch.
+
+Explore to your heart's content -- the museum is an infinitely large space! 
+Every time you move to a new room, we pseudorandomly choose a selection of
+new paintings to display.  Do note that, because we are pulling images
+directly from Wikipedia, the images take a second or so to load.  As a
+result, you may initially see some blank walls before the galleries are
+populated with paintings.  Also, some categories have fewer paintings than
+others, meaning that not every wall will have a painting.
+
+You can also opt to change the paintings in a room by inputting a category of
+your choice in the textbox atop the page.  You will be getting a list of
+suggestions as you start typing, so pick one to get started!
+
+-----------------------------------------------------------------------------
+FUTURE DIRECTION:
+
+We see this gallery as a potentially useful educational tool, and we would
+like to develop features that will help users learn more about the paintings
+they see.  It would be nice if links to articles about the painting are made
+available through our interface, and we could display more information about
+each painting in the scene.
+
+In terms of graphics improvements, we would certainly like to improve our
+shaders and implement shadow mapping.  We may also tackle some of the items
+in our original proposal (that turned out to be much more difficult to
+implement than we imagined, especially in WebGL, which is still rather
+sparsely documented).
+
