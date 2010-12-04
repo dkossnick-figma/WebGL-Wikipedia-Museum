@@ -43,20 +43,20 @@ function handleKeys() {
     pitchRate = 0;
   }
 
-  if (currentlyPressedKeys[37] || currentlyPressedKeys[65]) {
+  if (currentlyPressedKeys[37]) {
     // Left cursor key or A
     yawRate = 0.1;
-  } else if (currentlyPressedKeys[39] || currentlyPressedKeys[68]) {
+  } else if (currentlyPressedKeys[39]) {
     // Right cursor key or D
     yawRate = -0.1;
   } else {
     yawRate = 0;
   }
 
-  if (currentlyPressedKeys[38] || currentlyPressedKeys[87]) {
+  if (currentlyPressedKeys[38]) {
     // Up cursor key or W
     speed = 0.003;
-  } else if (currentlyPressedKeys[40] || currentlyPressedKeys[83]) {
+  } else if (currentlyPressedKeys[40]) {
     // Down cursor key
     speed = -0.003;
   } else {
@@ -136,11 +136,9 @@ function animate() {
         
         // going south
         if (oldXPos < xPos) {
-          //console.log("going north!");
-          WAGinstance.onTeleport(WAGConsts.NORTH);
+          WAGinstance.onTeleport(WAGConsts.NORTH, "");
         } else {
-          //console.log("going south!");
-          WAGinstance.onTeleport(WAGConsts.SOUTH);
+          WAGinstance.onTeleport(WAGConsts.SOUTH, "");
         }
 
       } else if (Math.abs(zPos) >= 1.9 && Math.abs(zPos) <= 2.4
@@ -157,9 +155,9 @@ function animate() {
         }
 
         if (oldZPos < zPos) {
-          WAGinstance.onTeleport(WAGConsts.WEST);
+          WAGinstance.onTeleport(WAGConsts.WEST, "");
         } else {
-          WAGinstance.onTeleport(WAGConsts.EAST);
+          WAGinstance.onTeleport(WAGConsts.EAST, "");
         }
       }
     }

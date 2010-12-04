@@ -1,6 +1,22 @@
 body {
+  margin: 0;
   font-size: 11px;
   font-family: "Lucida Grande";
+}
+
+a {
+  color: #4F94CD;
+}
+
+a:link, a:visited {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
+
+p {
+  margin: 0 10px 0 10px;
 }
 
 #loadingtext {

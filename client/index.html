@@ -3,7 +3,17 @@
 <head>
 <title>Wikipedia Art Gallery</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/fonts/fonts-min.css" />
+<link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/autocomplete/assets/skins/sam/autocomplete.css" />
+    <link rel="stylesheet" type="text/css" href="http://yui.yahooapis.com/2.8.2r1/build/reset-fonts/reset-fonts.css" />
+
 <link rel="stylesheet" href="includes/wag.css" type="text/css" />
+
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.2r1/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.2r1/build/datasource/datasource-min.js"></script>
+<script type="text/javascript" src="http://yui.yahooapis.com/2.8.2r1/build/autocomplete/autocomplete-min.js"></script>
 
 <script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.min.js"></script>
 <script type="text/javascript" src="includes/sylvester.js"></script>
@@ -251,15 +261,33 @@
 </script>
 </head>
 
-<body>
-  <canvas id="wagCanvas" style="border: none;" width="900" height="650"></canvas>
- 
-  <div id="loadingtext">Loading...</div>
+<body class="yui-skin-sam">
+<form onSubmit="WAGinstance.changeCategory(); return false;">
+<table style="font-size:13px;">
+<tr>
+<td>
+<img src="waglogo.png" />
+</td>
+<td>
+<div style="width:400px; margin:-10px 10px 0 15px;">
+<input id="s" />
+<div id="suggestions"></div>
+</div>
+</td>
+<td>
+<input type="submit" value="Go" />
+</td>
+</tr>
+</table>
+</form>
 
-  <br/>
-Use the cursor keys or WASD to run around, and <code>Page Up</code>/<code>Page Down</code> (fn arrow keys on Mac) to
-look up and down.
-  <span id="advanced_visibility" onClick='$("#advanced").toggle();'>Advanced</span>
+<canvas id="wagCanvas" style="border: none;" width="900" height="650"></canvas>
+<div id="loadingtext">Loading...</div>
+
+<p>Use the cursor keys to run around, and <code>Page Up</code>/<code>Page Down</code> (<code>fn</code> + arrow keys on Mac) to
+look up and down. <a href="" onClick='$("#advanced").toggle(); return false;'>Advanced</a> </p>
+
+
 <div id="advanced" style="display:none;">
     <div id="debug"></div>
     <div id="debug2"></div>
@@ -320,17 +348,261 @@ look up and down.
     <td colspan="7">Inner Angle: <input type="text" id="inner_angle" value="0.1" />
     &nbsp;Outer Angle: <input type="text" id="outer_angle" value="0.9" /></td>
     </tr>
-    <tr>
-    <th>Category:</th>
-    <td colspan="7">
-    <form id="categoryChanger">
-    <input type="text" id="categoryInput" size="30" value="Category:Leonardo_da_Vinci_paintings" disabled="disabled" />
-    <input type="submit" value="Go" disabled="disabled" />
-    </form>
-    </td>
-    </tr>
+
     </table>
 </div>
+
+
+
+<script type="text/javascript">
+// <![CDATA[
+
+var suggestions = [
+{username:"Category:Baroque paintings"},
+{username:"Category:Cubist paintings"},
+{username:"Category:Dutch Golden Age paintings"},
+{username:"Category:Expressionist paintings"},
+{username:"Category:Futurist painting"},
+{username:"Category:Gothic paintings"},
+{username:"Category:Impressionist paintings"},
+{username:"Category:Mannerist paintings"},
+{username:"Category:Modern paintings"},
+{username:"Category:Neoclassical paintings"},
+{username:"Category:Post-impressionist paintings"},
+{username:"Category:Pre-Raphaelite paintings"},
+{username:"Category:Renaissance paintings"},
+{username:"Category:Rococo paintings"},
+{username:"Category:Romantic paintings"},
+{username:"Category:Surrealist paintings"},
+{username:"Category:Symbolist paintings"},
+{username:"Category:Collection of the Alte Pinakothek"},
+{username:"Category:Collections of the Art Gallery of New South Wales"},
+{username:"Category:Collections of Birmingham Museum and Art Gallery"},
+{username:"Category:Paintings in the Borghese collection"},
+{username:"Category:Collections of the Capodimonte Gallery"},
+{username:"Category:Paintings of the Art Institute of Chicago"},
+{username:"Category:Collection of the Courtauld Institute of Art"},
+{username:"Category:Collection of the Czartoryski Museum"},
+{username:"Category:Collections of the Lady Lever Art Gallery"},
+{username:"Category:Collections of the National Maritime Museum, Greenwich"},
+{username:"Category:Collections of Derby Museum and Art Gallery"},
+{username:"Category:Collections of the Doria Pamphilj Gallery"},
+{username:"Category:Collections of the Gemäldegalerie Alte Meister"},
+{username:"Category:Collections of the Museum of Fine Arts, Ghent"},
+{username:"Category:Paintings of the Glass House"},
+{username:"Category:Paintings of the Hermitage"},
+{username:"Category:Paintings of the Kunsthistorisches Museum"},
+{username:"Category:Paintings of the Louvre"},
+{username:"Category:Collections of the Musée des Beaux-Arts de Lyon"},
+{username:"Category:Paintings of the Metropolitan Museum of Art"},
+{username:"Category:Paintings of the Museum of Fine Arts, Boston"},
+{username:"Category:Collections of the National Gallery of Art"},
+{username:"Category:Collections of the National Gallery of Australia"},
+{username:"Category:Collections of the National Gallery of Canada"},
+{username:"Category:Collections of the National Gallery of Victoria"},
+{username:"Category:Collections of the National Gallery, London"},
+{username:"Category:Paintings of the National Museum Cardiff"},
+{username:"Category:Collections of the National Galleries of Scotland"},
+{username:"Category:Collections of the Norton Simon Museum of Art"},
+{username:"Category:Collections of the Art Gallery of Ontario"},
+{username:"Category:Collections of the Musée d'Orsay"},
+{username:"Category:Paintings in the Gemäldegalerie, Berlin"},
+{username:"Category:Collections of Palazzo Pitti"},
+{username:"Category:Collections of the Museo del Prado"},
+{username:"Category:Collections of the Rijksmuseum"},
+{username:"Category:Collections of the Royal Museums of Fine Arts of Belgium"},
+{username:"Category:Paintings of the São Paulo Museum of Art"},
+{username:"Category:Paintings in the Uffizi by artist"},
+{username:"Category:Paintings of the Vatican Museums"},
+{username:"Category:Paintings of the Walker Art Gallery Liverpool"},
+{username:"Category:Ivan Aivazovsky paintings"},
+{username:"Category:Albrecht Altdorfer paintings"},
+{username:"Category:Fra Angelico paintings"},
+{username:"Category:Antonello da Messina paintings"},
+{username:"Category:Giuseppe Arcimboldo paintings"},
+{username:"Category:Francis Bacon paintings"},
+{username:"Category:Giovanni Bellini paintings"},
+{username:"Category:Benjamin West paintings"},
+{username:"Category:Art by William Blake"},
+{username:"Category:Hieronymus Bosch paintings"},
+{username:"Category:Botticelli paintings"},
+{username:"Category:William-Adolphe Bouguereau paintings"},
+{username:"Category:John Brack paintings"},
+{username:"Category:Karl Briullov paintings"},
+{username:"Category:Bronzino paintings"},
+{username:"Category:Ford Madox Brown paintings"},
+{username:"Category:Pieter Brueghel the Elder paintings"},
+{username:"Category:Edward Burne-Jones paintings"},
+{username:"Category:Alexandre Cabanel paintings"},
+{username:"Category:Gustave Caillebotte paintings"},
+{username:"Category:Caravaggio paintings"},
+{username:"Category:Carlo Carrà paintings"},
+{username:"Category:Carpaccio paintings"},
+{username:"Category:Annibale Carracci paintings"},
+{username:"Category:Marc Chagall paintings"},
+{username:"Category:Giorgio de Chirico paintings"},
+{username:"Category:Petrus Christus paintings"},
+{username:"Category:Cima da Conegliano paintings"},
+{username:"Category:Thomas Cole paintings"},
+{username:"Category:Frederik Collett paintings"},
+{username:"Category:John Constable paintings"},
+{username:"Category:John Singleton Copley paintings"},
+{username:"Category:Jean-Baptiste-Camille Corot paintings"},
+{username:"Category:Correggio paintings"},
+{username:"Category:Piero di Cosimo paintings"},
+{username:"Category:Gustave Courbet paintings"},
+{username:"Category:Art by George Cruikshank"},
+{username:"Category:Paul Cézanne paintings"},
+{username:"Category:Salvador Dalí paintings"},
+{username:"Category:Daniel Maclise paintings"},
+{username:"Category:Jacques-Louis David paintings"},
+{username:"Category:Edgar Degas paintings"},
+{username:"Category:Eugène Delacroix paintings"},
+{username:"Category:Paul Delaroche paintings"},
+{username:"Category:Russell Drysdale paintings"},
+{username:"Category:Duccio paintings"},
+{username:"Category:Marcel Duchamp works"},
+{username:"Category:Dürer paintings and prints"},
+{username:"Category:Thomas Eakins paintings"},
+{username:"Category:Max Ernst paintings"},
+{username:"Category:Works by M. C. Escher"},
+{username:"Category:Jan van Eyck paintings"},
+{username:"Category:Henri Fantin-Latour paintings"},
+{username:"Category:Piero della Francesca paintings"},
+{username:"Category:Caspar David Friedrich paintings"},
+{username:"Category:Thomas Gainsborough paintings"},
+{username:"Category:Paul Gauguin paintings"},
+{username:"Category:Artemisia Gentileschi paintings"},
+{username:"Category:Nikolai Getman paintings"},
+{username:"Category:Giorgione paintings"},
+{username:"Category:Giotto paintings"},
+{username:"Category:Francisco Goya paintings"},
+{username:"Category:Benozzo Gozzoli paintings"},
+{username:"Category:El Greco paintings"},
+{username:"Category:Matthias Grünewald paintings"},
+{username:"Category:Hans Gude paintings"},
+{username:"Category:Guercino paintings"},
+{username:"Category:Théodore Géricault paintings"},
+{username:"Category:Frans Hals paintings"},
+{username:"Category:William Hogarth paintings and prints"},
+{username:"Category:Hans Holbein the Younger paintings"},
+{username:"Category:Winslow Homer paintings"},
+{username:"Category:Edward Hopper paintings"},
+{username:"Category:Arthur Hughes paintings"},
+{username:"Category:William Holman Hunt paintings"},
+{username:"Category:Jean Auguste Dominique Ingres paintings"},
+{username:"Category:Gustav Klimt paintings"},
+{username:"Category:Ivan Kramskoi paintings"},
+{username:"Category:Georges de la Tour paintings"},
+{username:"Category:Edwin Landseer paintings"},
+{username:"Category:Frederic Leighton paintings"},
+{username:"Category:Leonardo da Vinci paintings"},
+{username:"Category:Henry Lerolle paintings"},
+{username:"Category:Filippino Lippi paintings"},
+{username:"Category:Filippo Lippi paintings"},
+{username:"Category:Louis Janmot paintings"},
+{username:"Category:Juan Luna paintings"},
+{username:"Category:Mabuse paintings"},
+{username:"Category:René Magritte paintings"},
+{username:"Category:Lois Mailou Jones paintings"},
+{username:"Category:Édouard Manet paintings"},
+{username:"Category:Mantegna paintings"},
+{username:"Category:John Martin paintings"},
+{username:"Category:Masaccio paintings"},
+{username:"Category:Jan Matejko paintings"},
+{username:"Category:Henri Matisse paintings"},
+{username:"Category:Frederick McCubbin paintings"},
+{username:"Category:Hans Memling paintings"},
+{username:"Category:Michelangelo paintings"},
+{username:"Category:John Everett Millais paintings"},
+{username:"Category:Jean-François Millet paintings"},
+{username:"Category:Piet Mondrian paintings"},
+{username:"Category:Claude Monet paintings"},
+{username:"Category:Edvard Munch paintings"},
+{username:"Category:Perugino paintings"},
+{username:"Category:Pablo Picasso paintings"},
+{username:"Category:Pisanello paintings"},
+{username:"Category:Camille Pissarro paintings"},
+{username:"Category:Pontormo paintings"},
+{username:"Category:Nicolas Poussin paintings"},
+{username:"Category:Henry Raeburn paintings"},
+{username:"Category:Raphael paintings"},
+{username:"Category:Rembrandt paintings"},
+{username:"Category:Pierre-Auguste Renoir paintings"},
+{username:"Category:Ilya Repin paintings"},
+{username:"Category:Joshua Reynolds paintings"},
+{username:"Category:Tom Roberts paintings"},
+{username:"Category:Norman Rockwell paintings"},
+{username:"Category:José Rodrigues paintings"},
+{username:"Category:Dante Gabriel Rossetti paintings"},
+{username:"Category:Henri Rousseau paintings"},
+{username:"Category:Rubens paintings"},
+{username:"Category:Sebastiano Del Piombo paintings"},
+{username:"Category:Georges Seurat paintings"},
+{username:"Category:Grace Cossington Smith paintings"},
+{username:"Category:Jan Steen paintings"},
+{username:"Category:Frank Stella paintings"},
+{username:"Category:Frits Thaulow"},
+{username:"Category:Tiepolo paintings"},
+{username:"Category:Tintoretto paintings"},
+{username:"Category:Titian paintings"},
+{username:"Category:Henri de Toulouse-Lautrec paintings"},
+{username:"Category:John Trumbull paintings"},
+{username:"Category:J. M. W. Turner paintings"},
+{username:"Category:Paolo Uccello paintings"},
+{username:"Category:Vincent van Gogh paintings"},
+{username:"Category:Velazquez paintings"},
+{username:"Category:Johannes Vermeer paintings"},
+{username:"Category:Paolo Veronese paintings"},
+{username:"Category:Andrea del Verrocchio paintings"},
+{username:"Category:Art by Andy Warhol"},
+{username:"Category:John William Waterhouse paintings"},
+{username:"Category:Jean-Antoine Watteau paintings"},
+{username:"Category:Rogier van der Weyden paintings"},
+{username:"Category:James McNeill Whistler paintings"},
+{username:"Category:Ellis Wilson paintings"},
+{username:"Category:Joseph Wright of Derby paintings"},
+{username:"Category:Zhang Zeduan paintings"},
+{username:"Category:Zoffany paintings"},
+{username:"Category:Paintings depicting Greek myths"},
+{username:"Category:Paintings of Venus"},
+{username:"Category:Paintings depicting death"},
+{username:"Category:Paintings on the theme of death"},
+{username:"Category:Paintings with biblical themes"},
+{username:"Category:Roman Catholic Church paintings"},
+{username:"Category:Lost paintings"}
+];
+
+YAHOO.util.Event.onDOMReady(function() {
+
+    var ds = new YAHOO.util.LocalDataSource(suggestions);
+    ds.responseSchema = { fields: ["username"] };
+    var ac = new YAHOO.widget.AutoComplete("s", "suggestions", ds);
+    ac.animVert = false;
+    ac.autoHighlight = true;
+    ac.forceSelection = true;
+    ac.maxResultsDisplayed = 16;
+    ac.prehighlightClassName = "yui-ac-prehighlight";
+    ac.queryDelay = 0;
+    ac.queryMatchContains = true;
+    ac.resultTypeList = false;
+    ac.useShadow = true;/*
+    ac.itemSelectEvent.subscribe(function(sType, aArgs) {
+        YAHOO.util.Dom.get("username").value = aArgs[2].username;
+    });
+
+    document.forms.view.username.focus();
+    document.forms.view.username.value = document.forms.view.username.value;*/
+
+});
+
+// ]]>
+</script>
+
+
+
+
+
 </body>
 
 </html>

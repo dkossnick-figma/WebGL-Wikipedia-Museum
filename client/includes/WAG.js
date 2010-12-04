@@ -82,7 +82,8 @@ function WAG(canvas) {
     } else {
       $('#loadingtext').fadeIn("medium");
       // substring below removes the "category:" at the start of the str
-      $('#loadingtext').text("Gallery of " + data.category.substring(9));
+      $('#s').val(data.category.replace(/_/gi, " "));
+      $('#loadingtext').text(data.category.substring(9).replace(/_/gi, " "));
       $('#loadingtext').fadeOut(3000);
     
       // Add the new room to the map
@@ -143,12 +144,13 @@ function WAG(canvas) {
   }
 
   this.changeCategory = function() {
-    var category = $('#categoryInput').val();
+    var category = $('#s').val();
 
-    $('#loadingtext').show();
+    this.onTeleport(WAGConsts.NORTH, category.replace(/ /g, "_"));
+    /*$('#loadingtext').show();
 
     // Since the node is on a different domain, we can't use Ajax.
-    this._fakeAjax('category/' + encodeURI(category));
+    this._fakeAjax('category/' + encodeURI(category));*/
 
     return false;
   }
@@ -160,11 +162,16 @@ function WAG(canvas) {
     this._fakeAjax('start');
   }
 
-  this.onTeleport = function(direction) {
+  this.onTeleport = function(direction, category) {
     this.prevPointer.key = this.currentRoom;
     this.prevPointer.dir = direction;
 
-    if (this.map[this.currentRoom][direction]) {
+    $('#loadingtext').text("Loading...");
+    $('#loadingtext').fadeIn("medium");
+
+    if (category != "") {
+      this._fakeAjax('category/' + encodeURI(category));    
+    } else if (this.map[this.currentRoom][direction]) {
       var goTo = this.map[this.currentRoom][direction].split("|");
       this._fakeAjax('category/' + goTo[0] + "/" + goTo[1]);
     } else {
