@@ -9,10 +9,6 @@ function WAG(canvas) {
     perFragment: {
       fragment: "includes/lighting-fs.frag",
       vertex:   "includes/lighting-vs.vert"
-    },
-    spotlight: {
-      fragment: "includes/spotlight-fs.frag",
-      vertex:   "includes/spotlight-vs.vert"
     }
   };
 
@@ -31,7 +27,7 @@ function WAG(canvas) {
     } catch(e) {
     }
     if (!gl) {
-      alert("Could not initialise WebGL, sorry :-(");
+      document.getElementById("loadingtext").innerHTML = "Could not initialize WebGL. Click <a href='http://www.windows7hacker.com/index.php/2010/02/how-to-enable-webgl-in-firefox-chrome-and-safari/'>here</a> for information on how to enable WebGL in your browser.";
     }
 
     this.initShaders(function() {

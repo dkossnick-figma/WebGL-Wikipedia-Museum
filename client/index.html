@@ -132,11 +132,7 @@
 
     perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0);
 
-    if (document.getElementById("per-fragment-radio").checked) {
-      currentProgram = WAGinstance.perFragmentProgram;
-    } else if (document.getElementById("spotlight-radio").checked) {
-      currentProgram = WAGinstance.spotlightProgram;
-    }
+    currentProgram = WAGinstance.perFragmentProgram;
     gl.useProgram(currentProgram);
 
 
@@ -250,6 +246,7 @@
     WAGinstance.initialize();
   });
   
+  // from http://james.padolsey.com/javascript/get-document-height-cross-browser/
   function getDocHeight() {
     var D = document;
     return Math.max(
@@ -284,7 +281,7 @@
 <canvas id="wagCanvas" style="border: none;" width="900" height="650"></canvas>
 <div id="loadingtext">Loading...</div>
 
-<p>Use the cursor keys to run around, and <code>Page Up</code>/<code>Page Down</code> (<code>fn</code> + arrow keys on Mac) to
+<p id="instructions">Use the cursor keys to run around, and <code>Page Up</code>/<code>Page Down</code> (<code>fn</code> + arrow keys on Mac) to
 look up and down. <a href="" onClick='$("#advanced").toggle(); return false;'>Advanced</a> </p>
 
 
@@ -294,8 +291,6 @@ look up and down. <a href="" onClick='$("#advanced").toggle(); return false;'>Ad
       
     <label for="lighting"><input type="checkbox" id="lighting" checked="checked" /> Use lighting</label>
     <label for="textures"><input type="checkbox" id="textures" checked="checked" /> Use textures</label>
-    <label for="per-fragment-radio"><input type="radio" name="shader" id="per-fragment-radio" value="per-fragment" checked="checked" /> Per-fragment</label>
-    <label for="spotlight-radio"><input type="radio" name="shader" id="spotlight-radio" value="spotlight" /> Spotlight</label>
     <br/>
     
     <table id="parameterTable">

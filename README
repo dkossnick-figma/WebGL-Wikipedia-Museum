@@ -120,7 +120,7 @@ your choice in the textbox atop the page.  You will be getting a list of
 suggestions as you start typing, so pick one to get started!
 
 -----------------------------------------------------------------------------
-FUTURE DIRECTION:
+FUTURE DIRECTIONS:
 
 We see this gallery as a potentially useful educational tool, and we would
 like to develop features that will help users learn more about the paintings
@@ -129,8 +129,5 @@ available through our interface, and we could display more information about
 each painting in the scene.
 
 In terms of graphics improvements, we would certainly like to improve our
-shaders and implement shadow mapping.  We may also tackle some of the items
-in our original proposal (that turned out to be much more difficult to
-implement than we imagined, especially in WebGL, which is still rather
-sparsely documented).
+shaders and implement shadow mapping.
 
