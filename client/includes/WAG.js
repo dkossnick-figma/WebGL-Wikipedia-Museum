@@ -27,7 +27,10 @@ function WAG(canvas) {
     } catch(e) {
     }
     if (!gl) {
-      document.getElementById("loadingtext").innerHTML = "Could not initialize WebGL. Click <a href='http://www.windows7hacker.com/index.php/2010/02/how-to-enable-webgl-in-firefox-chrome-and-safari/'>here</a> for information on how to enable WebGL in your browser.";
+      $("#instructions").hide();
+      $("#loadingtext").css('top', '50px');
+      document.getElementById("loadingtext").innerHTML = "Could not initialize WebGL. Click <a href='http://www.windows7hacker.com/index.php/2010/02/how-to-enable-webgl-in-firefox-chrome-and-safari/'>here</a> for information on how to enable WebGL in your browser." +
+        "<br/><br/><center><embed src='includes/wikipedia_art_gallery_high_quality.mov' Pluginspage='http://www.apple.com/quicktime/' width='640' height='500' CONTROLLER='true' LOOP='false' AUTOPLAY='false' name='IBM Video'></embed></center>";
     }
 
     this.initShaders(function() {
