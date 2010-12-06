@@ -68,7 +68,12 @@ function Wikipedia(domain) {
         for (var i in data.query.pages) {
           var image = data.query.pages[i];
           image.title = this.normalizePageTitle(image.title);
-          images[image.title] = image.imageinfo[0].thumburl;
+          if (image.imageinfo.length > 0) {
+            images[image.title] = image.imageinfo[0].thumburl;
+          } else {
+            console.warn("Warning: " + image.title + " did not return valid " +
+              imageinfo);
+          }
         }
       }
       cb(images);
@@ -116,9 +121,9 @@ function Wikipedia(domain) {
           };
           if (page.images) {
             for (var i in page.images) {
-              var title = page.images[i].title;
-              if (title.match(jpeg_regex)) {
-                page_stage.image_title = this.normalizePageTitle(title);
+              var title = this.normalizePageTitle(page.images[i].title);
+              if (title.match(jpeg_regex) && !title.match(blacklist_regex)) {
+                page_stage.image_title = title;
               }
             }
           }

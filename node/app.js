@@ -12,6 +12,7 @@ var http = require("http"),
 
 process.on("uncaughtException", function(err) {
   console.error("Caught uncaught exception: " + err);
+  console.error(err.stack);
 });
 
 // Read in files
@@ -77,6 +78,13 @@ function handleCategoryImages(req, res, data) {
         continue;
       }
     }
+
+    // If category is really small ( < 4 images ), blacklist it
+    if (data.pages.length < 4) {
+      console.log("BLACKLIST CANDIDATE: " + req.session.curCategory + "|"
+        + oldContinueKey);
+    }
+
     var result = {
       category: req.session.curCategory,
       oldContinueKey: oldContinueKey,
@@ -101,7 +109,7 @@ app.get("/category/:cat/:ckey?", function(req, res) {
  * Called when the Art Gallery first initializes. Chooses an initial gallery in
  * which to start and returns whatever /category/:cat would return for it.
  */
-app.get("/start", function(req, res) {
+var appFuncStart = function(req, res) {
   var total = catWhitelist.length;
   var startIndex = Math.floor(Math.random() * catWhitelist.length);
   req.session.curIndex = startIndex;
@@ -109,7 +117,8 @@ app.get("/start", function(req, res) {
   wp.getCategoryImages(catWhitelist[startIndex], null, function(data) {
     handleCategoryImages(req, res, data);
   });
-});
+}
+app.get("/start", appFuncStart);
 
 /**
  * Given an active session, returns the next gallery room. That's either more
@@ -132,10 +141,9 @@ var appFuncMore = function(req, res) {
         });
     }
   } else {
-    console.error("Client violated protocol: should have called /start first");
-    res.send({
-      resultCode: WAGConsts.INVALID_ACTION
-    });
+    // /more was called before /start, maybe node was restarted?
+    console.warn("/more called before /start, recovering");
+    appFuncStart(req, res);
     return;
   }
 }
